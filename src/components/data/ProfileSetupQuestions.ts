@@ -64,7 +64,7 @@ export const profileSetupQuestions = [
     id: 9,
     question: "Great! Submit your answers to generate your profile",
     name: "created_profile",
-    placeholder: "true",
+    placeholder: "",
     validation: { required: false },
   },
 ];
