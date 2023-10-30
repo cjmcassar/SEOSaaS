@@ -1,21 +1,33 @@
-# Salvia-kit Next.js Dashboards
+# KeyFind - SEO SaaS Tool
 
-![Salvia-kit Dashboard v1](https://www.salvia-kit.com/images/dashboards/dashv1.png)
+KeyFind is a SEO SaaS tool that leverages the power of GPT API and Google Ads API to find keywords for SEO analysis.
 
-![Salvia-kit Dashboard v2](https://www.salvia-kit.com/images/dashboards/dashv2.jpg)
+## Features
 
-![Salvia-kit Dashboard v3](https://www.salvia-kit.com/images/dashboards/dashv3.png)
+- Uses GPT API for advanced keyword generation.
+- Utilizes Google Ads API for comprehensive SEO analysis.
+- Provides a user-friendly dashboard for easy navigation and usage.
 
-![Salvia-kit Dashboard v4](https://www.salvia-kit.com/images/dashboards/dashv4.jpg)
+## Usage
 
-![Salvia-kit Dashboard v5](https://www.salvia-kit.com/images/dashboards/dashv5.jpg)
+1. Clone the repository.
+2. Install the dependencies using `pnpm install`.
+3. Start the application using `pnpm run dev` for development mode or `pnpm run start` for production mode.
 
-![Salvia-kit Dashboard v6](https://www.salvia-kit.com/images/dashboards/dashv6.jpg)
+## Available Scripts
 
-![Salvia-kit Dashboard v7](https://www.salvia-kit.com/images/dashboards/dashv7.jpg)
+In the project directory, you can run:
 
-![Salvia-kit Dashboard v8](https://www.salvia-kit.com/images/dashboards/dashv8.jpg)
+- `pnpm run dev` - Starts the development server.
+- `pnpm run build` - Builds the app for production.
+- `pnpm run start` - Runs the built app in production mode.
+- `pnpm run lint` - Runs the linter and fixes issues.
+- `pnpm run format` - Runs the code formatter.
 
-![Salvia-kit Dashboard v9](https://www.salvia-kit.com/images/dashboards/dashv9.png)
+## Contributing
 
-![Salvia-kit Dashboard v10](https://www.salvia-kit.com/images/dashboards/dashv10.png)
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+## License
+
+[MIT](https://choosealicense.com/licenses/mit/)
