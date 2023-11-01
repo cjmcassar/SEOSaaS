@@ -2,24 +2,43 @@ interface ContentProps {
 	title: string;
 }
 
-const ProjectCard = () => {
+interface ProjectData {
+	title: string;
+	date: string;
+	keywords: string;
+}
+
+interface ProjectCardProps {
+	data: ProjectData;
+}
+
+const ProjectCard = ({ data }: ProjectCardProps) => {
 	return (
 		<div className="w-full md:w-4/12">
 			<div className="p-2">
 				<div className="rounded-3xl bg-purple-200 p-4">
 					<div className="flex items-center">
-						<span className="text-sm">December 10, 2020</span>
+						<span className="text-sm">{data.date}</span>
 					</div>
 					<div className="mb-4 mt-5 text-center">
-						<p className="text-base font-bold opacity-70">Landing Page</p>
-						<p className="mt-2 text-sm opacity-70">Keywords List</p>
+						<p className="text-base font-bold opacity-70">{data.title}</p>
+						<p className=" opacity-70">Sample SEO Analysis:</p>
+						<p
+							className="mt-2 truncate text-sm opacity-70"
+							style={{ fontSize: "smaller" }}
+						>
+							{data.keywords.split(" ").slice(0, 5).join(" ")}
+						</p>
 					</div>
 					<div>
-						<p className="m-0 text-sm font-bold">Progress</p>
-						<div className="mx-0 my-2 h-1 w-full overflow-hidden rounded-md bg-white">
-							<span className="block h-1 w-7/12 rounded-md bg-purple-700" />
-						</div>
-						<p className="m-0 text-right text-sm font-bold">70%</p>
+						<p className="m-0 text-sm font-bold">Download</p>
+						<a
+							href="/path/to/csv/file.csv"
+							download
+							className="mx-0 my-2 text-purple-700 underline"
+						>
+							Full CSV file
+						</a>
 					</div>
 					<div className="relative flex justify-between pt-4">
 						<div className="flex items-center">
@@ -93,6 +112,26 @@ const KeyWordGenerator = () => {
 };
 
 export function Content(props: ContentProps) {
+	const projectData1: ProjectData = {
+		title: "Landing Page",
+		date: "December 10, 2020",
+		keywords:
+			"Fashion, Apparel, E-commerce, Online Shopping, SaaS, Marketplace, Clothing, Retail, B2C, Consumer",
+	};
+
+	const projectData2: ProjectData = {
+		title: "Marketplace",
+		date: "December 2, 2022",
+		keywords: "E-commerce, Online Shopping, Marketplace, Retail, B2C",
+	};
+
+	const projectData3: ProjectData = {
+		title: "About Us",
+		date: "December 1, 2023",
+		keywords:
+			"clothing store, about us page, fashion, apparel, e-commerce, online shopping, retail, B2C",
+	};
+
 	return (
 		<div className="flex flex-wrap">
 			<div className="w-full rounded-3xl bg-gray-800 p-6 lg:w-8/12">
@@ -117,9 +156,9 @@ export function Content(props: ContentProps) {
 					</div>
 				</div>
 				<div className="flex flex-wrap">
-					<ProjectCard />
-					<ProjectCard />
-					<ProjectCard />
+					<ProjectCard data={projectData1} />
+					<ProjectCard data={projectData2} />
+					<ProjectCard data={projectData3} />
 				</div>
 			</div>
 			<div className="mt-8 w-full lg:mt-0 lg:w-4/12 lg:pl-4">
