@@ -1,10 +1,26 @@
 export const questionSteps = [
 	{
 		id: 1,
-		question: "What does your business do?",
-		name: "business",
+		question:
+			"Are the keywords for your homepage, landing page, product page or blog post?",
+		name: "contentType",
 		placeholder: "Your answer",
 		validation: { required: true },
 	},
-	// Add more steps as needed
+	{
+		id: 2,
+		question:
+			"What is the focus of the page / keyword list? Be as specific or general as you like!",
+		name: "contentFocus",
+		placeholder: "Your answer",
+		validation: { required: true },
+	},
+	{
+		id: 3,
+		question:
+			"What frequently asked questions from your audience do you want to answer in the content?",
+		name: "faq",
+		placeholder: "Your answer",
+		validation: { required: true },
+	},
 ];
