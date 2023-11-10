@@ -3,7 +3,7 @@ import React from "react";
 export const SettingsContent = () => {
 	return (
 		<div className="flex h-screen  flex-wrap rounded-3xl bg-gray-800 p-5">
-			<div className="h-max w-full max-w-xl  rounded-3xl bg-white p-5 shadow-md">
+			<div className="h-max w-full max-w  rounded-3xl bg-white p-5 shadow-md">
 				<h2 className="text-center text-2xl font-bold">Profile Settings</h2>
 				<form className="flex flex-wrap">
 					<div className="w-1/2 pr-2">
@@ -102,12 +102,14 @@ export const SettingsContent = () => {
 							/>
 						</div>
 					</div>
-					<button
-						type="submit"
-						className="mt-5 w-full rounded-full bg-indigo-500 px-4 py-2 font-bold text-white hover:bg-indigo-700"
-					>
-						Submit
-					</button>
+					<div className="flex justify-center">
+						<button
+							type="submit"
+							className="mt-5 w-max rounded-full bg-indigo-500 px-4 py-2 font-bold text-white hover:bg-indigo-700"
+						>
+							Submit
+						</button>
+					</div>
 				</form>
 			</div>
 		</div>
