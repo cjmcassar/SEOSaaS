@@ -1,6 +1,6 @@
 import React from "react";
 
-export const SettingsContent = () => {
+export const SettingsContent: React.FC = () => {
 	return (
 		<div className="flex h-screen  flex-wrap rounded-3xl bg-gray-800 p-5">
 			<div className="h-max w-full max-w  rounded-3xl bg-white p-5 shadow-md">
