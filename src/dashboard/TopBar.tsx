@@ -1,3 +1,4 @@
+import { ProfileIcon } from "@/components/ProfileIcon";
 import { useDashboardContext } from "./Provider";
 
 interface MenuButtonProps {
@@ -63,13 +64,7 @@ export function TopBar() {
 						</div>
 					</div>
 					<div className="relative ml-5 flex w-full items-center justify-end p-1 sm:right-auto sm:mr-0">
-						<a href="#" className="relative block">
-							<img
-								alt="Maurice Lokumba"
-								src="/images/1.jpg"
-								className="mx-auto h-10 w-10 rounded-full object-cover"
-							/>
-						</a>
+						<ProfileIcon />
 					</div>
 				</div>
 			</div>
