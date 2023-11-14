@@ -24,6 +24,7 @@
 		"format": "prettier '*/**/*.{ts,tsx}' --write"
 	},
 	"dependencies": {
+		"@supabase/auth-helpers-nextjs": "^0.8.7",
 		"@supabase/supabase-js": "^2.38.4",
 		"next": "^13.4.10",
 		"openai": "^4.16.1",
