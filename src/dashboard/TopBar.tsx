@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { ProfileIcon } from "@/components/ProfileIcon";
 import { useDashboardContext } from "./Provider";
 
 interface MenuButtonProps {
@@ -40,73 +40,6 @@ const SearchIcon = () => (
 		<path d="M12.9 14.32a8 8 0 1 1 1.41-1.41l5.35 5.33-1.42 1.42-5.33-5.34zM8 14A6 6 0 1 0 8 2a6 6 0 0 0 0 12z" />
 	</svg>
 );
-
-const ProfileIcon = () => {
-	const [dropdownOpen, setDropdownOpen] = useState(false);
-
-	const toggleDropdown = () => {
-		setDropdownOpen(!dropdownOpen);
-	};
-
-	useEffect(() => {
-		const closeDropdown = () => {
-			if (dropdownOpen) {
-				setDropdownOpen(false);
-			}
-		};
-
-		window.addEventListener("click", closeDropdown);
-
-		return () => {
-			window.removeEventListener("click", closeDropdown);
-		};
-	}, [dropdownOpen]);
-
-	return (
-		<div className="relative">
-			<button
-				onClick={(e) => {
-					e.stopPropagation();
-					toggleDropdown();
-				}}
-				className="relative block"
-			>
-				<img
-					alt="Maurice Lokumba"
-					src="/images/1.jpg"
-					className="mx-auto h-10 w-10 rounded-full object-cover"
-				/>
-			</button>
-			{dropdownOpen && (
-				<div
-					onClick={(e) => e.stopPropagation()}
-					className="absolute right-0 mt-2 w-48 divide-y divide-gray-100 rounded-md border border-gray-200 bg-white shadow-lg"
-				>
-					<div className="px-4 py-3">
-						<p className="text-sm leading-5">Signed in as</p>
-						<p className="truncate text-sm font-medium leading-5 text-gray-900">
-							Maurice Lokumba
-						</p>
-					</div>
-					<div className="py-1">
-						{/* <a
-							href="#"
-							className="text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 block px-4 py-2"
-						>
-							Your Profile
-						</a> */}
-						<a
-							href="#"
-							className="block px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-						>
-							Sign out
-						</a>
-					</div>
-				</div>
-			)}
-		</div>
-	);
-};
 
 export function TopBar() {
 	const { openSidebar } = useDashboardContext();
