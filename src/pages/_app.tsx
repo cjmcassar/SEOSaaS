@@ -1,11 +1,13 @@
-import Head from "next/head";
-import "tailwindcss/tailwind.css";
 import { AppProps } from "next/app";
-import { DashboardLayout } from "@/dashboard/Layout";
-
-import { supabase } from "../utils/supabaseClient";
-import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import Head from "next/head";
+
+import "tailwindcss/tailwind.css";
+
+import { DashboardLayout } from "@/dashboard/Layout";
+import { ProfileSetup } from "@/components/ProfileSetup";
+import { supabase } from "../utils/supabaseClient";
 
 type User = {
 	id: string;
@@ -15,6 +17,7 @@ type User = {
 function MyApp({ Component, pageProps }: AppProps) {
 	const [user, setUser] = useState<User | null>(null);
 	// Todo: make this use state a cookie instead of a state later. Just doing this atm to test route
+	const [isProfileSetupComplete, setProfileSetupComplete] = useState(false);
 	const router = useRouter();
 
 	useEffect(() => {
@@ -29,6 +32,9 @@ function MyApp({ Component, pageProps }: AppProps) {
 					id: data.user.id,
 					email: data.user.email || null,
 				});
+				const isSetupComplete = false;
+				// Todo: setup database so this information is there
+				setProfileSetupComplete(isSetupComplete);
 			}
 		};
 
@@ -49,8 +55,13 @@ function MyApp({ Component, pageProps }: AppProps) {
 			<Head>
 				<title>KeyFind</title>
 			</Head>
+
 			<DashboardLayout>
-				<Component {...pageProps} />
+				<div className="flex justify-center">
+					{" "}
+					{!isProfileSetupComplete && <ProfileSetup />}{" "}
+				</div>
+				{isProfileSetupComplete && <Component {...pageProps} />}
 			</DashboardLayout>
 		</>
 	);
