@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { questionSteps } from "./data/FormQuestions";
+import { keyWordQuestionSteps } from "./data/KeywordQuestions";
 
 type FormValues = {
 	// Define your form fields here. For example:
@@ -16,7 +16,7 @@ export const KeyWordGenerator = () => {
 
 	const onSubmit: SubmitHandler<FormValues> = (data) => {
 		console.log(data);
-		if (step < questionSteps.length) {
+		if (step < keyWordQuestionSteps.length) {
 			setStep((prevStep) => prevStep + 1);
 		} else {
 			restartProcess();
@@ -38,14 +38,14 @@ export const KeyWordGenerator = () => {
 						className="h-full rounded-full bg-blue-500 text-center text-xs text-white transition-all duration-300"
 						style={{
 							width: `${Math.min(
-								((step - 1) / questionSteps.length) * 100,
+								(step / keyWordQuestionSteps.length) * 100,
 								100,
 							)}%`,
 						}}
 					></div>
 				</div>
 				<form onSubmit={handleSubmit(onSubmit)}>
-					{questionSteps.map(
+					{keyWordQuestionSteps.map(
 						(stepItem, index) =>
 							index + 1 === step && (
 								<div key={stepItem.id} className="flex flex-col ">
@@ -55,13 +55,15 @@ export const KeyWordGenerator = () => {
 									>
 										{stepItem.question}
 									</label>
-									<textarea
-										className="mt-6 h-24 w-full rounded border p-2"
-										id={stepItem.name}
-										placeholder={stepItem.placeholder}
-										required={stepItem.validation.required}
-										{...register(stepItem.name as keyof FormValues)}
-									/>
+									{stepItem.name !== "finalStep" && (
+										<textarea
+											className="mt-6 h-24 w-full rounded border p-2"
+											id={stepItem.name}
+											placeholder={stepItem.placeholder}
+											required={stepItem.validation.required}
+											{...register(stepItem.name as keyof FormValues)}
+										/>
+									)}
 								</div>
 							),
 					)}
@@ -71,7 +73,9 @@ export const KeyWordGenerator = () => {
 							className="mb-2 rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700 focus:outline-none"
 							type="submit"
 						>
-							{step < questionSteps.length + 1 ? "Next" : "New Keyword List"}
+							{step < keyWordQuestionSteps.length
+								? "Next"
+								: "Create New Keyword List"}
 						</button>
 					</div>
 				</form>
