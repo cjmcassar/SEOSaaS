@@ -60,4 +60,11 @@ export const profileSetupQuestions = [
 		placeholder: "e.g., Feature A (Benefit A), Feature B (Benefit B), etc.",
 		validation: { required: true },
 	},
+	{
+		id: 9,
+		question: "Great! Submit your answers to generate your profile",
+		name: "createYourProfile",
+		placeholder: "",
+		validation: { required: false },
+	},
 ];
