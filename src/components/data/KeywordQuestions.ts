@@ -1,4 +1,4 @@
-export const questionSteps = [
+export const keyWordQuestionSteps = [
 	{
 		id: 1,
 		question:
@@ -22,5 +22,13 @@ export const questionSteps = [
 		name: "faq",
 		placeholder: "Your answer",
 		validation: { required: true },
+	},
+	{
+		id: 4,
+		question:
+			"That's it! Submit your answers to generate your project's SEO keywords!",
+		name: "finalStep",
+		placeholder: "",
+		validation: { required: false },
 	},
 ];

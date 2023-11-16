@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { keyWordQuestionSteps } from "./data/KeywordQuestions";
+import { profileSetupQuestions } from "./data/ProfileSetupQuestions";
 
 type FormValues = {
 	// Define your form fields here. For example:
@@ -10,13 +10,13 @@ type FormValues = {
 	// Add more fields as needed
 };
 
-export const KeyWordGenerator = () => {
+export const ProfileSetup = () => {
 	const { register, handleSubmit } = useForm<FormValues>();
 	const [step, setStep] = useState(1);
 
 	const onSubmit: SubmitHandler<FormValues> = (data) => {
 		console.log(data);
-		if (step < keyWordQuestionSteps.length) {
+		if (step < profileSetupQuestions.length) {
 			setStep((prevStep) => prevStep + 1);
 		} else {
 			restartProcess();
@@ -28,7 +28,7 @@ export const KeyWordGenerator = () => {
 	};
 
 	return (
-		<div className="rounded-3xl bg-gray-800 px-6 pt-6">
+		<div className="z-50 w-1/2 rounded-3xl bg-gray-800 px-6 pt-6">
 			<div className="flex pb-6 text-2xl font-bold text-white">
 				<p>Generate Keywords</p>
 			</div>
@@ -38,14 +38,14 @@ export const KeyWordGenerator = () => {
 						className="h-full rounded-full bg-blue-500 text-center text-xs text-white transition-all duration-300"
 						style={{
 							width: `${Math.min(
-								(step / keyWordQuestionSteps.length) * 100,
+								(step / profileSetupQuestions.length) * 100,
 								100,
 							)}%`,
 						}}
 					></div>
 				</div>
 				<form onSubmit={handleSubmit(onSubmit)}>
-					{keyWordQuestionSteps.map(
+					{profileSetupQuestions.map(
 						(stepItem, index) =>
 							index + 1 === step && (
 								<div key={stepItem.id} className="flex flex-col ">
@@ -55,7 +55,7 @@ export const KeyWordGenerator = () => {
 									>
 										{stepItem.question}
 									</label>
-									{stepItem.name !== "finalStep" && (
+									{stepItem.name !== "createYourProfile" && (
 										<textarea
 											className="mt-6 h-24 w-full rounded border p-2"
 											id={stepItem.name}
@@ -73,9 +73,9 @@ export const KeyWordGenerator = () => {
 							className="mb-2 rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700 focus:outline-none"
 							type="submit"
 						>
-							{step < keyWordQuestionSteps.length
+							{step < profileSetupQuestions.length
 								? "Next"
-								: "Create New Keyword List"}
+								: "Create Your Profile"}
 						</button>
 					</div>
 				</form>
