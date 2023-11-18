@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { profileSetupQuestions } from "./data/ProfileSetupQuestions";
+import { supabase } from "@/utils/supabaseClient";
 
 type FormValues = {
 	// Define your form fields here. For example:
@@ -14,12 +15,23 @@ export const ProfileSetup = () => {
 	const { register, handleSubmit } = useForm<FormValues>();
 	const [step, setStep] = useState(1);
 
-	const onSubmit: SubmitHandler<FormValues> = (data) => {
+	const onSubmit: SubmitHandler<FormValues> = async (data) => {
 		console.log(data);
 		if (step < profileSetupQuestions.length) {
 			setStep((prevStep) => prevStep + 1);
 		} else {
-			restartProcess();
+			// Store the user's answers in the Supabase database
+			const { error } = await supabase.from("profiles").insert([
+				{
+					user_id: (await supabase.auth.getUser()).data.user?.id,
+					answers: data,
+				},
+			]);
+			if (error) {
+				console.error("Error inserting data: ", error);
+			} else {
+				restartProcess();
+			}
 		}
 	};
 
@@ -30,7 +42,7 @@ export const ProfileSetup = () => {
 	return (
 		<div className="z-50 w-1/2 rounded-3xl bg-gray-800 px-6 pt-6">
 			<div className="flex pb-6 text-2xl font-bold text-white">
-				<p>Generate Keywords</p>
+				<p>Profile Setup</p>
 			</div>
 			<div>
 				<div className="mb-3 h-2 w-full rounded-full bg-gray-200">
