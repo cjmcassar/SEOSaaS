@@ -4,6 +4,14 @@ import { profileSetupQuestions } from "./data/ProfileSetupQuestions";
 import { supabase } from "@/utils/supabaseClient";
 
 type FormValues = {
+	businessModel: string;
+	profitableProducts: string;
+	targetAudience: string;
+	competitorsContent: string;
+	valueProposition: string;
+	businessObjectives: string;
+	keyFeatures: string;
+	industry: string;
 	// Define your form fields here. For example:
 	field1: string;
 	field2: number;
@@ -16,15 +24,25 @@ export const ProfileSetup = () => {
 	const [step, setStep] = useState(1);
 
 	const onSubmit: SubmitHandler<FormValues> = async (data) => {
-		console.log(data);
+		console.log("form data:", data);
 		if (step < profileSetupQuestions.length) {
 			setStep((prevStep) => prevStep + 1);
 		} else {
-			// Store the user's answers in the Supabase database
+			const mappedData = {
+				industry_served: data.industry,
+				business_model: data.businessModel,
+				profitable_products_services: data.profitableProducts,
+				target_audience_ideal_customer: data.targetAudience,
+				competitors_relevant_content: data.competitorsContent,
+				unique_value_proposition: data.valueProposition,
+				primary_business_objectives: data.businessObjectives,
+				key_features_benefits: data.keyFeatures,
+				created_your_profile: true,
+			};
 			const { error } = await supabase.from("profiles").insert([
 				{
 					user_id: (await supabase.auth.getUser()).data.user?.id,
-					answers: data,
+					...mappedData,
 				},
 			]);
 			if (error) {
