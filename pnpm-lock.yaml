@@ -3,6 +3,7 @@ lockfileVersion: 5.4
 specifiers:
   '@supabase/auth-helpers-nextjs': ^0.8.7
   '@supabase/supabase-js': ^2.38.4
+  '@types/lodash': ^4.14.201
   '@types/node': 20.3.1
   '@types/react': 18.2.12
   '@types/react-dom': 18.2.5
@@ -13,6 +14,7 @@ specifiers:
   eslint-plugin-prettier: ^4.2.1
   eslint-plugin-tailwindcss: ^3.12.1
   eslint-plugin-unused-imports: ^2.0.0
+  lodash: ^4.17.21
   next: ^13.4.10
   openai: ^4.16.1
   postcss: 8.4.24
@@ -26,6 +28,8 @@ specifiers:
 dependencies:
   '@supabase/auth-helpers-nextjs': 0.8.7_6334e7jt22cxct46ozox7hiogy
   '@supabase/supabase-js': 2.38.4
+  '@types/lodash': 4.14.201
+  lodash: 4.17.21
   next: 13.5.6_biqbaboplfbrettd7655fr4n2y
   openai: 4.16.1
   react: 18.2.0
@@ -353,6 +357,10 @@ packages:
   /@types/json5/0.0.29:
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
     dev: true
+
+  /@types/lodash/4.14.201:
+    resolution: {integrity: sha512-y9euML0cim1JrykNxADLfaG0FgD1g/yTHwUs/Jg9ZIU7WKj2/4IW9Lbb1WZbvck78W/lfGXFfe+u2EGfIJXdLQ==}
+    dev: false
 
   /@types/node-fetch/2.6.9:
     resolution: {integrity: sha512-bQVlnMLFJ2d35DkPNjEPmd9ueO/rh5EiaZt2bhqiSarPjZIuIV6bPQVqcrEyvNo+AfTrRGVazle1tl597w3gfA==}
@@ -2021,6 +2029,10 @@ packages:
   /lodash.merge/4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
     dev: true
+
+  /lodash/4.17.21:
+    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
+    dev: false
 
   /loose-envify/1.4.0:
     resolution: {integrity: sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==}

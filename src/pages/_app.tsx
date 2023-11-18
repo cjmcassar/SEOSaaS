@@ -10,31 +10,41 @@ import { ProfileSetup } from "@/components/ProfileSetup";
 import { supabase } from "../utils/supabaseClient";
 
 type User = {
-	id: string;
+	id: string | undefined;
 	email: string | null;
 };
 
 function MyApp({ Component, pageProps }: AppProps) {
 	const [user, setUser] = useState<User | null>(null);
-	// Todo: make this use state a cookie instead of a state later. Just doing this atm to test route
-	const [isProfileSetupComplete, setProfileSetupComplete] = useState(false);
+	const [isProfileSetupComplete, setProfileSetupComplete] = useState();
 	const router = useRouter();
 
 	useEffect(() => {
 		const fetchUser = async () => {
 			console.log("Fetching user...");
-			const { data, error } = await supabase.auth.getUser();
-			if (error) {
-				console.error("Error fetching user:", error);
+			const session = await supabase.auth.getSession();
+			if (session.data.session === null) {
+				console.error("Error fetching user:", session);
 			} else {
-				console.log("User fetched successfully:", data);
+				console.log("User fetched successfully:", session.data.session.user);
 				setUser({
-					id: data.user.id,
-					email: data.user.email || null,
+					id: session.data.session?.user.id,
+					email: session.data.session?.user.email || null,
 				});
-				const isSetupComplete = false;
-				// Todo: setup database so this information is there
-				setProfileSetupComplete(isSetupComplete);
+
+				const { data: profileData, error: profileError } = await supabase
+					.from("profiles")
+					.select("created_profile")
+					.eq("user_id", session.data.session?.user.id)
+					.single();
+
+				if (profileError) {
+					console.error("Error fetching profile:", profileError);
+				} else {
+					const isSetupComplete = profileData?.created_profile;
+					console.log("Is profile setup complete:", isSetupComplete);
+					setProfileSetupComplete(isSetupComplete);
+				}
 			}
 		};
 
@@ -58,10 +68,10 @@ function MyApp({ Component, pageProps }: AppProps) {
 
 			<DashboardLayout>
 				<div className="flex justify-center">
-					{" "}
-					{!isProfileSetupComplete && <ProfileSetup />}{" "}
+					{!isProfileSetupComplete && user ? <ProfileSetup /> : null}
 				</div>
-				{isProfileSetupComplete && <Component {...pageProps} />}
+				{!isProfileSetupComplete && !user ? <Component {...pageProps} /> : null}
+				{isProfileSetupComplete && user ? <Component {...pageProps} /> : null}
 			</DashboardLayout>
 		</>
 	);

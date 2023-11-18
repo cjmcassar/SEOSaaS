@@ -1,117 +1,123 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { profileSetupQuestions } from "./data/ProfileSetupQuestions";
+import { supabase } from "@/utils/supabaseClient"; // Import the supabase client
+import _ from "lodash";
+
+type FormValues = {
+  industry_served: string;
+  business_model: string;
+  profitable_products_services: string;
+  target_audience_ideal_customer: string;
+  competitors_relevant_content: string;
+  unique_value_proposition: string;
+  primary_business_objectives: string;
+  key_features_benefits: string;
+};
+
+type PlaceholderData = {
+  industry_served: string;
+  business_model: string;
+  profitable_products_services: string;
+  target_audience_ideal_customer: string;
+  competitors_relevant_content: string;
+  unique_value_proposition: string;
+  primary_business_objectives: string;
+  key_features_benefits: string;
+};
 
 export const SettingsContent: React.FC = () => {
-	return (
-		<div className="flex h-screen  flex-wrap rounded-3xl bg-gray-800 p-5">
-			<div className="h-max w-full max-w  rounded-3xl bg-white p-5 shadow-md">
-				<h2 className="text-center text-2xl font-bold">Profile Settings</h2>
-				<form className="flex flex-wrap">
-					<div className="w-1/2 pr-2">
-						<div className="mt-5">
-							<label className="mb-2 block text-sm font-bold text-gray-700">
-								Industry:
-							</label>
-							<input
-								type="text"
-								name="industry"
-								placeholder="What industry do you serve?"
-								className="w-full rounded-lg border px-4 py-2 text-gray-700 focus:border-indigo-500 focus:outline-none"
-								style={{ width: "100%" }}
-							/>
-						</div>
-						<div className="mt-5">
-							<label className="mb-2 block text-sm font-bold text-gray-700">
-								Business model:
-							</label>
-							<input
-								type="text"
-								name="businessModel"
-								placeholder="SaaS, Agency, Ecom, etc"
-								className="w-full rounded-lg border px-4 py-2 text-gray-700 focus:border-indigo-500 focus:outline-none"
-								style={{ width: "100%" }}
-							/>
-						</div>
-						<div className="mt-5">
-							<label className="mb-2 block text-sm font-bold text-gray-700">
-								Most profitable products/services:
-							</label>
-							<input
-								type="text"
-								name="profitableProducts"
-								placeholder="Tell us what is working?"
-								className="w-full rounded-lg border px-4 py-2 text-gray-700 focus:border-indigo-500 focus:outline-none"
-								style={{ width: "100%" }}
-							/>
-						</div>
-						<div className="mt-5">
-							<label className="mb-2 block text-sm font-bold text-gray-700">
-								Target audience / ideal customer:
-							</label>
-							<input
-								type="text"
-								name="targetAudience"
-								placeholder="Who do you create value for?"
-								className="w-full rounded-lg border px-4 py-2 text-gray-700 focus:border-indigo-500 focus:outline-none"
-								style={{ width: "100%" }}
-							/>
-						</div>
-					</div>
-					<div className="w-1/2 pl-2">
-						<div className="mt-5">
-							<label className="mb-2 block text-sm font-bold text-gray-700">
-								Competitors' content:
-							</label>
-							<textarea
-								name="competitorsContent"
-								placeholder="What content are your competitors creating that is also relevant to your business?"
-								className="h-20 w-full rounded-lg border px-4 py-2 text-gray-700 focus:border-indigo-500 focus:outline-none"
-								style={{ width: "100%" }}
-							/>
-						</div>
-						<div className="mt-5">
-							<label className="mb-2 block text-sm font-bold text-gray-700">
-								Unique Value Proposition:
-							</label>
-							<textarea
-								name="valueProposition"
-								placeholder="What is your business’s Unique Value Proposition?"
-								className="h-20 w-full rounded-lg border px-4 py-2 text-gray-700 focus:border-indigo-500 focus:outline-none"
-								style={{ width: "100%" }}
-							/>
-						</div>
-						<div className="mt-5">
-							<label className="mb-2 block text-sm font-bold text-gray-700">
-								Primary business objectives:
-							</label>
-							<textarea
-								name="businessObjectives"
-								placeholder="What are your primary business objectives?"
-								className="h-20 w-full rounded-lg border px-4 py-2 text-gray-700 focus:border-indigo-500 focus:outline-none"
-								style={{ width: "100%" }}
-							/>
-						</div>
-						<div className="mt-5">
-							<label className="mb-2 block text-sm font-bold text-gray-700">
-								Benefits of your products/services:
-							</label>
-							<textarea
-								name="keyFeatures"
-								placeholder="What are the key features and benefits of your products/services?"
-								className="h-20 w-full rounded-lg border px-4 py-2 text-gray-700 focus:border-indigo-500 focus:outline-none"
-								style={{ width: "100%" }}
-							/>
-						</div>
-					</div>
-					<div className="flex justify-center">
-						<button
-							type="submit"
-							className="mt-5 w-max rounded-full bg-indigo-500 px-4 py-2 font-bold text-white hover:bg-indigo-700"
-						>
-							Submit
-						</button>
-					</div>
-				</form>
-			</div>
-		</div>
-	);
+  const { register, handleSubmit } = useForm<FormValues>();
+  const [placeholderData, setPlaceholderData] =
+    useState<PlaceholderData | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select() // replace 'column_name' with the name of the column you want to fetch
+        .eq("user_id", (await supabase.auth.getUser()).data.user?.id)
+        .single();
+
+      if (error) {
+        console.error("Error fetching data: ", error);
+      } else {
+        console.log("placehodler data:", data);
+        setPlaceholderData(data); // replace 'column_name' with the name of the column you fetched
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const onSubmit = async (data: FormValues) => {
+    let changes: Partial<FormValues> = {};
+
+    for (const key in data) {
+      const typedKey = key as keyof FormValues;
+      if (
+        data[typedKey] !== "" &&
+        !_.isEqual(
+          data[typedKey],
+          placeholderData?.[key as keyof PlaceholderData],
+        )
+      ) {
+        changes[typedKey] = data[typedKey];
+      }
+    }
+
+    // Send data to Supabase
+    const { error } = await supabase
+      .from("profiles")
+      // Replace 'profiles' with your table name
+      .update(changes)
+      .eq("user_id", (await supabase.auth.getUser()).data.user?.id);
+
+    if (error) {
+      console.error("Error inserting data: ", error);
+    } else {
+      console.log("Data inserted successfully!");
+    }
+  };
+
+  return (
+    <div className="flex h-screen flex-wrap rounded-3xl bg-gray-800 p-5">
+      <div className="h-max w-full rounded-3xl bg-white p-5 shadow-md">
+        <h2 className="mb-4 text-center text-2xl font-bold">
+          Profile Settings
+        </h2>
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="grid grid-cols-1 gap-4 md:grid-cols-2"
+        >
+          {profileSetupQuestions.slice(0, -1).map((question, index) => (
+            <div key={question.id}>
+              <label className="mb-2 block text-sm font-bold text-gray-700">
+                {question.question}
+              </label>
+              <textarea
+                {...register(question.name as keyof FormValues)}
+                name={question.name}
+                defaultValue={
+                  placeholderData
+                    ? String(
+                        placeholderData[question.name as keyof PlaceholderData],
+                      )
+                    : ""
+                }
+                className="h-20 w-full overflow-auto rounded-lg border px-4 py-2 text-gray-700 focus:border-indigo-500 focus:outline-none"
+                style={{ width: "100%" }}
+              />
+            </div>
+          ))}
+          <button
+            type="submit"
+            className="col-span-1 mt-5 w-max rounded-full bg-indigo-500 px-4 py-2 font-bold text-white hover:bg-indigo-700 md:col-span-2"
+          >
+            Submit
+          </button>
+        </form>
+      </div>
+    </div>
+  );
 };
