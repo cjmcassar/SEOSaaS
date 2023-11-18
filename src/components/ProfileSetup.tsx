@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { profileSetupQuestions } from "./data/ProfileSetupQuestions";
 import { supabase } from "@/utils/supabaseClient";
+import router from "next/router";
 
 type FormValues = {
 	businessModel: string;
@@ -37,7 +38,7 @@ export const ProfileSetup = () => {
 				unique_value_proposition: data.valueProposition,
 				primary_business_objectives: data.businessObjectives,
 				key_features_benefits: data.keyFeatures,
-				created_your_profile: true,
+				created_profile: true,
 			};
 			const { error } = await supabase.from("profiles").insert([
 				{
@@ -45,10 +46,12 @@ export const ProfileSetup = () => {
 					...mappedData,
 				},
 			]);
+
 			if (error) {
 				console.error("Error inserting data: ", error);
 			} else {
 				restartProcess();
+				router.reload();
 			}
 		}
 	};
