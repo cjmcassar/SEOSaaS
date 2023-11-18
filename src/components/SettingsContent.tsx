@@ -1,35 +1,122 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { profileSetupQuestions } from "./data/ProfileSetupQuestions";
+import { supabase } from "@/utils/supabaseClient"; // Import the supabase client
+import _ from "lodash";
+
+type FormValues = {
+  industry_served: string;
+  business_model: string;
+  profitable_products_services: string;
+  target_audience_ideal_customer: string;
+  competitors_relevant_content: string;
+  unique_value_proposition: string;
+  primary_business_objectives: string;
+  key_features_benefits: string;
+};
+
+type PlaceholderData = {
+  industry_served: string;
+  business_model: string;
+  profitable_products_services: string;
+  target_audience_ideal_customer: string;
+  competitors_relevant_content: string;
+  unique_value_proposition: string;
+  primary_business_objectives: string;
+  key_features_benefits: string;
+};
 
 export const SettingsContent: React.FC = () => {
+  const { register, handleSubmit } = useForm<FormValues>();
+  const [placeholderData, setPlaceholderData] =
+    useState<PlaceholderData | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select() // replace 'column_name' with the name of the column you want to fetch
+        .eq("user_id", (await supabase.auth.getUser()).data.user?.id)
+        .single();
+
+      if (error) {
+        console.error("Error fetching data: ", error);
+      } else {
+        console.log("placehodler data:", data);
+        setPlaceholderData(data); // replace 'column_name' with the name of the column you fetched
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const onSubmit = async (data: FormValues) => {
+    let changes: Partial<FormValues> = {};
+
+    for (const key in data) {
+      const typedKey = key as keyof FormValues;
+      if (
+        data[typedKey] !== "" &&
+        !_.isEqual(
+          data[typedKey],
+          placeholderData?.[key as keyof PlaceholderData],
+        )
+      ) {
+        changes[typedKey] = data[typedKey];
+      }
+    }
+
+    // Send data to Supabase
+    const { error } = await supabase
+      .from("profiles")
+      // Replace 'profiles' with your table name
+      .update(changes)
+      .eq("user_id", (await supabase.auth.getUser()).data.user?.id);
+
+    if (error) {
+      console.error("Error inserting data: ", error);
+    } else {
+      console.log("Data inserted successfully!");
+    }
+  };
+
   return (
     <div className="flex h-screen flex-wrap rounded-3xl bg-gray-800 p-5">
       <div className="h-max w-full rounded-3xl bg-white p-5 shadow-md">
-        <h2 className="text-center text-2xl font-bold">Profile Settings</h2>
-        <form className="grid grid-cols-2 gap-4">
-          {profileSetupQuestions.map((question, index) => (
+        <h2 className="mb-4 text-center text-2xl font-bold">
+          Profile Settings
+        </h2>
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="grid grid-cols-1 gap-4 md:grid-cols-2"
+        >
+          {profileSetupQuestions.slice(0, -1).map((question, index) => (
             <div key={question.id}>
-              <div className="mt-5">
-                <label className="mb-2 block text-sm font-bold text-gray-700">
-                  {question.question}
-                </label>
-                <textarea
-                  name={question.name}
-                  className="h-20 w-full overflow-auto rounded-lg border px-4 py-2 text-gray-700 focus:border-indigo-500 focus:outline-none"
-                  style={{ width: "100%" }}
-                />
-              </div>
+              <label className="mb-2 block text-sm font-bold text-gray-700">
+                {question.question}
+              </label>
+              <textarea
+                {...register(question.name as keyof FormValues)}
+                name={question.name}
+                defaultValue={
+                  placeholderData
+                    ? String(
+                        placeholderData[question.name as keyof PlaceholderData],
+                      )
+                    : ""
+                }
+                className="h-20 w-full overflow-auto rounded-lg border px-4 py-2 text-gray-700 focus:border-indigo-500 focus:outline-none"
+                style={{ width: "100%" }}
+              />
             </div>
           ))}
-        </form>
-        <div className="flex justify-center">
           <button
             type="submit"
-            className="mt-5 w-max rounded-full bg-indigo-500 px-4 py-2 font-bold text-white hover:bg-indigo-700"
+            className="col-span-1 mt-5 w-max rounded-full bg-indigo-500 px-4 py-2 font-bold text-white hover:bg-indigo-700 md:col-span-2"
           >
             Submit
           </button>
-        </div>
+        </form>
       </div>
     </div>
   );
