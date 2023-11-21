@@ -13,11 +13,6 @@ type FormValues = {
   businessObjectives: string;
   keyFeatures: string;
   industry: string;
-  // Define your form fields here. For example:
-  field1: string;
-  field2: number;
-
-  // Add more fields as needed
 };
 
 export const ProfileSetup = () => {
