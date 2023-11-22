@@ -88,6 +88,51 @@ export const KeyWordGenerator = () => {
           console.error("Error inserting GPT response: ", gptError);
         }
 
+        //todo: now send the list to google ads api. 2. See the results. Use gpt to choose the top keywords and store that information in supabase
+
+        //         // Step 1: Send the list to Google Ads API
+        // const googleAdsResponse = await fetch("https://googleadsapi.example.com/keywords", {
+        //   method: "POST",
+        //   headers: {
+        //     "Content-Type": "application/json",
+        //   },
+        //   body: JSON.stringify({ keywords: data.choices?.[0].message.content.split(",") }),
+        // });
+
+        // // Step 2: See the results
+        // const googleAdsData = await googleAdsResponse.json();
+        // console.log("Google Ads Data:", googleAdsData);
+
+        // // Step 3: Use GPT to choose the top keywords
+        // const gptTopKeywordsResponse = await fetch("/api/gptResponse", {
+        //   method: "POST",
+        //   headers: {
+        //     "Content-Type": "application/json",
+        //   },
+        //   body: JSON.stringify({ prompt: googleAdsData }),
+        // });
+
+        // const gptTopKeywordsData = await gptTopKeywordsResponse.json();
+        // console.log("GPT Top Keywords:", gptTopKeywordsData);
+
+        // // Step 4: Store that information in Supabase
+        // const { data: supabaseData, error: supabaseError } = await supabase
+        //   .from("gpt_top_keywords")
+        //   .insert([
+        //     {
+        //       keyword_generator_id: keywordGenPromptId,
+        //       gpt_top_keywords: gptTopKeywordsData.choices?.[0].message.content,
+        //       user_id: user?.user?.id,
+        //     },
+        //   ])
+        //   .select();
+
+        // console.log("Supabase Data:", supabaseData);
+
+        // if (supabaseError) {
+        //   console.error("Error inserting GPT top keywords: ", supabaseError);
+        // }
+
         restartProcess();
       }
     }
