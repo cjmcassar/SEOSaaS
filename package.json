@@ -27,6 +27,7 @@
 		"@supabase/auth-helpers-nextjs": "^0.8.7",
 		"@supabase/supabase-js": "^2.38.4",
 		"@types/lodash": "^4.14.201",
+		"google-ads-api": "^14.2.0",
 		"lodash": "^4.17.21",
 		"next": "^13.4.10",
 		"openai": "^4.16.1",
