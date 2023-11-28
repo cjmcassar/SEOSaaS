@@ -15,11 +15,15 @@ type FormValues = {
   // Add more fields as needed
 };
 
+//TODO: add in a wait wheel until the data is finished procuessing
+
 export const KeyWordGenerator = () => {
   const profileInfo = useContext(ProfileInfoContext);
   const user = useContext(UserContext);
   const { register, handleSubmit } = useForm<FormValues>();
   const [step, setStep] = useState(1);
+
+  //TODO: come back and refactor this monstrosity
 
   const onSubmit: SubmitHandler<FormValues> = async data => {
     if (step < keyWordQuestionSteps.length) {
@@ -108,45 +112,63 @@ export const KeyWordGenerator = () => {
             console.log("The request has already been sent. Skipping...");
           } else {
             // Send the keywords to the googleAdsGenerateKeywords API route
-            const response = await fetch("/api/googleAdsGenerateKeywords", {
+
+            await fetch("/api/googleAdsGenerateKeywords", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
               },
               body: JSON.stringify({ keywords: gptKeywords }),
-            });
+            })
+              .then(response => response.json())
+              .then(async data => {
+                const csvData = data.csvResultArray;
+                const resultID = data.resultID;
 
-            const csvData = await response.text();
+                console.log("CSV DATA CLIENT:", csvData);
+                console.log("DATA FOR SERO TRANSACTION RESULT ID:", resultID);
 
-            const { data: uploadData, error: uploadError } =
-              await supabase.storage
-                .from("google-keywords-csv")
-                .upload(
-                  `${user?.user?.id}/${gptKeywords?.[0].keyword_generator_id}.csv`,
-                  csvData,
-                  { contentType: "text/csv" },
-                );
+                // Convert promptData.page_type to lower case and replace spaces with underscores
+                const formattedPageType = promptData.page_type
+                  .toLowerCase()
+                  .replace(/ /g, "_");
 
-            //todo: add in secure policy to supabase before going live.
+                const { data: uploadData, error: uploadError } =
+                  await supabase.storage
+                    .from("google-keywords-csv")
+                    .upload(
+                      `${user?.user?.id}/${formattedPageType}/${resultID}_${gptKeywords?.[0].keyword_generator_id}.csv`,
+                      csvData,
+                      { contentType: "text/csv" },
+                    );
 
-            if (uploadError) {
-              console.error("Error uploading CSV to Supabase: ", uploadError);
-            } else {
-              console.log("CSV uploaded to Supabase: ", uploadData);
-            }
+                //todo: add in secure policy to supabase before going live.
 
-            // After sending the request, update the has_been_posted_to_api field to true
-            const { error: updateError } = await supabase
-              .from("gpt_keyword_results")
-              .update({ has_been_posted_to_api: true })
-              .eq("id", gptKeywords?.[0].id);
+                if (uploadError) {
+                  console.error(
+                    "Error uploading CSV to Supabase: ",
+                    uploadError,
+                  );
+                } else {
+                  console.log("CSV uploaded to Supabase: ", uploadData);
+                }
 
-            if (updateError) {
-              console.error(
-                "Error updating has_been_posted_to_api: ",
-                updateError,
-              );
-            }
+                // After sending the request, update the has_been_posted_to_api field to true
+                const { error: updateError } = await supabase
+                  .from("gpt_keyword_results")
+                  .update({ has_been_posted_to_api: true })
+                  .eq("id", gptKeywords?.[0].id);
+
+                if (updateError) {
+                  console.error(
+                    "Error updating has_been_posted_to_api: ",
+                    updateError,
+                  );
+                }
+              })
+              .catch(error => {
+                console.error("Error:", error);
+              });
 
             restartProcess();
           }
