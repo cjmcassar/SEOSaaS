@@ -21,10 +21,7 @@ export const KeyWordGenerator = () => {
   const { register, handleSubmit } = useForm<FormValues>();
   const [step, setStep] = useState(1);
 
-  console.log("Profile Info:", profileInfo);
-
   const onSubmit: SubmitHandler<FormValues> = async data => {
-    console.log(data);
     if (step < keyWordQuestionSteps.length) {
       setStep(prevStep => prevStep + 1);
     } else {
@@ -44,7 +41,7 @@ export const KeyWordGenerator = () => {
         console.error("Error inserting data: ", error);
       } else {
         // Implementing the open ai prompt module getGptResponse here
-        console.log("keyword prompt data from supabase:", keywordGenPrompt);
+
         const keywordGenPromptId = keywordGenPrompt[0].id;
 
         const promptData = {
@@ -55,10 +52,9 @@ export const KeyWordGenerator = () => {
 
         const prompt = `SEO marketer with profile ${JSON.stringify(
           profileInfo,
-        )} is seeking to generate at least 35 keywords for their company. The provided data for this task is ${JSON.stringify(
+        )} is seeking to generate exactly 10 keywords for their company. The provided data for this task is ${JSON.stringify(
           promptData,
-        )}. Please provide the SEO keyword suggestions as a continuous text and not as a list or numbered items. Only return the keywords, no other descriptions or assistant text is necessary.`;
-        console.log("the updated prompt:", prompt);
+        )}. Please provide the SEO keyword suggestions as a continuous text, separated by commas, and not as a list or numbered items. Only return the keywords, no other descriptions or assistant text is necessary.`;
 
         const gptResponse = await fetch("/api/gptResponse", {
           method: "POST",
@@ -69,7 +65,13 @@ export const KeyWordGenerator = () => {
         });
 
         const data = await gptResponse.json();
-        console.log("GPT Says:", data);
+
+        const gptResponseWords = data.choices?.[0].message.content.split(", ");
+        if (gptResponseWords.length > 10) {
+          data.choices[0].message.content = gptResponseWords
+            .slice(0, 10)
+            .join(", ");
+        }
 
         const { data: gptResponseData, error: gptError } = await supabase
           .from("gpt_keyword_results")
@@ -82,58 +84,73 @@ export const KeyWordGenerator = () => {
           ])
           .select();
 
-        console.log("GPT Response Data:", gptResponseData);
-
         if (gptError) {
           console.error("Error inserting GPT response: ", gptError);
         }
 
-        //todo: now send the list to google ads api. 2. See the results. Use gpt to choose the top keywords and store that information in supabase
+        // Fetch the GPT keywords from Supabase
+        const { data: gptKeywords, error } = await supabase
+          .from("gpt_keyword_results")
+          .select(
+            "gpt_response, id, keyword_generator_id, has_been_posted_to_api",
+          )
+          .eq("user_id", user?.user?.id)
+          .eq(
+            "keyword_generator_id",
+            gptResponseData?.[0].keyword_generator_id,
+          );
 
-        //         // Step 1: Send the list to Google Ads API
-        // const googleAdsResponse = await fetch("https://googleadsapi.example.com/keywords", {
-        //   method: "POST",
-        //   headers: {
-        //     "Content-Type": "application/json",
-        //   },
-        //   body: JSON.stringify({ keywords: data.choices?.[0].message.content.split(",") }),
-        // });
+        if (error) {
+          console.error("Error fetching GPT keywords: ", error);
+        } else {
+          // Check if the request has already been sent
+          if (gptKeywords?.[0].has_been_posted_to_api) {
+            console.log("The request has already been sent. Skipping...");
+          } else {
+            // Send the keywords to the googleAdsGenerateKeywords API route
+            const response = await fetch("/api/googleAdsGenerateKeywords", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ keywords: gptKeywords }),
+            });
 
-        // // Step 2: See the results
-        // const googleAdsData = await googleAdsResponse.json();
-        // console.log("Google Ads Data:", googleAdsData);
+            const csvData = await response.text();
 
-        // // Step 3: Use GPT to choose the top keywords
-        // const gptTopKeywordsResponse = await fetch("/api/gptResponse", {
-        //   method: "POST",
-        //   headers: {
-        //     "Content-Type": "application/json",
-        //   },
-        //   body: JSON.stringify({ prompt: googleAdsData }),
-        // });
+            const { data: uploadData, error: uploadError } =
+              await supabase.storage
+                .from("google-keywords-csv")
+                .upload(
+                  `${user?.user?.id}/${gptKeywords?.[0].keyword_generator_id}.csv`,
+                  csvData,
+                  { contentType: "text/csv" },
+                );
 
-        // const gptTopKeywordsData = await gptTopKeywordsResponse.json();
-        // console.log("GPT Top Keywords:", gptTopKeywordsData);
+            //todo: add in secure policy to supabase before going live.
 
-        // // Step 4: Store that information in Supabase
-        // const { data: supabaseData, error: supabaseError } = await supabase
-        //   .from("gpt_top_keywords")
-        //   .insert([
-        //     {
-        //       keyword_generator_id: keywordGenPromptId,
-        //       gpt_top_keywords: gptTopKeywordsData.choices?.[0].message.content,
-        //       user_id: user?.user?.id,
-        //     },
-        //   ])
-        //   .select();
+            if (uploadError) {
+              console.error("Error uploading CSV to Supabase: ", uploadError);
+            } else {
+              console.log("CSV uploaded to Supabase: ", uploadData);
+            }
 
-        // console.log("Supabase Data:", supabaseData);
+            // After sending the request, update the has_been_posted_to_api field to true
+            const { error: updateError } = await supabase
+              .from("gpt_keyword_results")
+              .update({ has_been_posted_to_api: true })
+              .eq("id", gptKeywords?.[0].id);
 
-        // if (supabaseError) {
-        //   console.error("Error inserting GPT top keywords: ", supabaseError);
-        // }
+            if (updateError) {
+              console.error(
+                "Error updating has_been_posted_to_api: ",
+                updateError,
+              );
+            }
 
-        restartProcess();
+            restartProcess();
+          }
+        }
       }
     }
   };
