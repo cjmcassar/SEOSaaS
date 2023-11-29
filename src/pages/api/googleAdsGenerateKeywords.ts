@@ -72,31 +72,35 @@ export default async function handler(
       throw new Error(`HTTP error! status: ${getResponse.status}`);
     }
 
-    const getResult = await getResponse.json();
+    const getFetchResults = await getResponse.json();
 
-    console.log("results response:", getResult);
+    console.log("results response:", getFetchResults);
 
-    if (getResult.tasks?.[0].status_code !== 20000) {
+    if (getFetchResults.tasks?.[0].status_code !== 20000) {
       // Wait for 2 seconds before trying again
       await new Promise(resolve => setTimeout(resolve, 2000));
       return fetchTask(taskId, attempt + 1);
     } else {
-      return getResult;
+      return getFetchResults;
     }
   }
 
   // Use the function
   try {
-    const getResult = await fetchTask(taskId);
+    const getFetchResults = await fetchTask(taskId);
 
     // Convert JSON to CSV
 
-    const resultArray = getResult.tasks[0].result;
+    const resultAmount = getFetchResults.tasks[0].result_count;
 
-    const csv = parse(resultArray);
+    const resultArray = getFetchResults.tasks[0].result;
+
+    const resultID = getFetchResults.tasks[0].id;
+
+    const csvResultArray = parse(resultArray);
 
     res.setHeader("Content-Type", "text/csv");
-    res.status(200).send(csv);
+    res.status(200).json({ csvResultArray, resultID, resultAmount });
     //todo: sift through the data, convert to a CSV, and store in supabase
   } catch (error) {
     const err = error as Error;
