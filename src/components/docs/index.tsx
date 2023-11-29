@@ -1,5 +1,5 @@
-import { Snippet } from "./Snippet";
 import { FileIcon, FolderIcon, JSXIcon } from "./Icons";
+import { Snippet } from "./Snippet";
 
 export function Docs() {
   return (

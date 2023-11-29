@@ -1,7 +1,9 @@
 import Link from "next/link";
-import { data } from "./data";
 import { useRouter } from "next/router";
+
 import { useDashboardContext } from "../Provider";
+
+import { data } from "./data";
 
 const style = {
   title: "mx-4 text-sm whitespace-pre",
@@ -18,7 +20,7 @@ export function SidebarItems() {
 
   return (
     <ul className="md:pl-3">
-      {data.map((item) => (
+      {data.map(item => (
         <li key={item.title}>
           <Link href={item.link}>
             <span className={style.link}>

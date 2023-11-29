@@ -1,7 +1,8 @@
-import css from "../style.module.css";
-import { SidebarItems } from "./SidebarItems";
-import { SidebarHeader } from "./SidebarHeader";
 import { useDashboardContext } from "../Provider";
+import css from "../style.module.css";
+
+import { SidebarHeader } from "./SidebarHeader";
+import { SidebarItems } from "./SidebarItems";
 
 interface SidebarProps {
   mobileOrientation: "start" | "end";

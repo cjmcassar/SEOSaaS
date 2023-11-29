@@ -90,7 +90,7 @@ export function Content(props: ContentProps) {
             </div>
           </div>
         </div>
-        <div className="ProjectCardDiv flex flex-wrap">
+        <div className="flex flex-wrap">
           {projects?.map(project => (
             <ProjectCard key={project.id} data={project} />
           ))}

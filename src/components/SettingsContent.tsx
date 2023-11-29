@@ -97,7 +97,7 @@ export const SettingsContent: React.FC = () => {
           onSubmit={handleSubmit(onSubmit)}
           className="grid grid-cols-1 gap-4 md:grid-cols-2"
         >
-          {profileSetupQuestions.slice(0, -1).map((question, index) => (
+          {profileSetupQuestions.slice(0, -1).map(question => (
             <div key={question.id}>
               <label className="mb-2 block text-sm font-bold text-gray-700">
                 {question.question}

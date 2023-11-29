@@ -1,8 +1,9 @@
 import React from "react";
-import { TopBar } from "./TopBar";
+
 import { Overlay } from "./Overlay";
-import { Sidebar } from "./sidebar/Sidebar";
 import { DashboardProvider } from "./Provider";
+import { Sidebar } from "./sidebar/Sidebar";
+import { TopBar } from "./TopBar";
 
 interface LayoutProps {
   children: React.ReactNode;

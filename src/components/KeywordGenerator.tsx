@@ -180,6 +180,7 @@ export const KeyWordGenerator = () => {
                     "Error logging project data to Supabase: ",
                     projectError,
                   );
+                  console.log("projectData passed to supabase:", projectData);
                 }
 
                 // After sending the request, update the has_been_posted_to_api field to true

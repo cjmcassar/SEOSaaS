@@ -1,6 +1,7 @@
 // pages/api/gptResponse.js
-import { getGptResponse } from "@/utils/openaAuth";
 import { NextApiRequest, NextApiResponse } from "next";
+
+import { getGptResponse } from "@/utils/openaAuth";
 
 export default async function handler(
   req: NextApiRequest,

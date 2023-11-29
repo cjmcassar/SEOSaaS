@@ -50,6 +50,7 @@ export const ProfileSetup = () => {
 
       if (error) {
         console.error("Error inserting data: ", error);
+        console.log("uploadedData being sent to sb:", uploadedData);
       } else {
         restartProcess();
         router.reload();

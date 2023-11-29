@@ -1,7 +1,8 @@
-import { useContext, useEffect, useState } from "react";
-import { supabase } from "@/utils/supabaseClient";
 import router from "next/router";
+import { useContext, useEffect, useState } from "react";
+
 import { UserContext } from "@/contexts/UserContext";
+import { supabase } from "@/utils/supabaseClient";
 
 export const ProfileIcon = () => {
   const { user } = useContext(UserContext) ?? {};
