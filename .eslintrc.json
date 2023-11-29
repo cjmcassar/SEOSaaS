@@ -1,6 +1,6 @@
 {
   "extends": ["next/core-web-vitals", "plugin:tailwindcss/recommended"],
-  "plugins": ["unused-imports", "tailwindcss"],
+  "plugins": ["unused-imports", "import", "tailwindcss"],
   "rules": {
     "quotes": ["error", "double"],
     "semi": ["error", "always"],
@@ -9,6 +9,24 @@
     "no-unused-vars": "off", // or "@typescript-eslint/no-unused-vars": "off",
     "unused-imports/no-unused-imports": "error",
     "react/no-unescaped-entities": 0,
+    "import/order": [
+      "error",
+      {
+        "groups": [
+          "builtin",
+          "external",
+          "internal",
+          "parent",
+          "sibling",
+          "index"
+        ],
+        "newlines-between": "always",
+        "alphabetize": {
+          "order": "asc",
+          "caseInsensitive": true
+        }
+      }
+    ],
     "unused-imports/no-unused-vars": [
       "warn",
       {
