@@ -1,12 +1,14 @@
 import React, { useContext, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { HashLoader } from "react-spinners";
+import { ToastContainer, toast } from "react-toastify";
 
 import { ProfileInfoContext } from "@/contexts/ProfileInfoContext";
 import { UserContext } from "@/contexts/UserContext";
 import { supabase } from "@/utils/supabaseClient";
 
 import { keyWordQuestionSteps } from "./data/KeywordQuestions";
+import "react-toastify/dist/ReactToastify.css";
 
 type FormValues = {
   // Define your form fields here. For example:
@@ -178,8 +180,6 @@ export const KeyWordGenerator = () => {
                     "Error logging project data to Supabase: ",
                     projectError,
                   );
-                } else {
-                  console.log("project data logged to Supabase: ", projectData);
                 }
 
                 // After sending the request, update the has_been_posted_to_api field to true
@@ -193,10 +193,15 @@ export const KeyWordGenerator = () => {
                     "Error updating has_been_posted_to_api: ",
                     updateError,
                   );
+                } else {
+                  toast.success(
+                    `${promptData.project_type} project was created!`,
+                  );
                 }
               })
               .catch(error => {
                 console.error("Error:", error);
+                toast.error("Error:", error);
               });
 
             restartProcess();
@@ -213,6 +218,7 @@ export const KeyWordGenerator = () => {
 
   return (
     <div className=" relative rounded-3xl bg-gray-800 px-6 pt-6">
+      <ToastContainer className="z-10" />
       {isLoading && (
         <div className="absolute ml-7 flex h-full w-3/4 items-center justify-center rounded-3xl ">
           <HashLoader color={"#6B46C1"} loading={isLoading} size={50} />
