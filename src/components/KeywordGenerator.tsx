@@ -5,6 +5,7 @@ import { supabase } from "@/utils/supabaseClient";
 
 import { ProfileInfoContext } from "@/contexts/ProfileInfoContext";
 import { UserContext } from "@/contexts/UserContext";
+import { HashLoader } from "react-spinners";
 
 type FormValues = {
   // Define your form fields here. For example:
@@ -15,19 +16,25 @@ type FormValues = {
   // Add more fields as needed
 };
 
+//TODO: add in a wait wheel until the data is finished procuessing
+
 export const KeyWordGenerator = () => {
   const profileInfo = useContext(ProfileInfoContext);
   const user = useContext(UserContext);
   const { register, handleSubmit } = useForm<FormValues>();
   const [step, setStep] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+
+  //TODO: come back and refactor this monstrosity
 
   const onSubmit: SubmitHandler<FormValues> = async data => {
+    setIsLoading(true);
     if (step < keyWordQuestionSteps.length) {
       setStep(prevStep => prevStep + 1);
     } else {
       const mappedData = {
-        page_type: data.contentType,
-        page_focus: data.contentFocus,
+        project_type: data.contentType,
+        project_focus: data.contentFocus,
         audience_faqs: data.audienceFAQs,
         user_id: user?.user?.id,
       };
@@ -45,8 +52,8 @@ export const KeyWordGenerator = () => {
         const keywordGenPromptId = keywordGenPrompt[0].id;
 
         const promptData = {
-          page_type: mappedData.page_type,
-          page_focus: mappedData.page_focus,
+          project_type: mappedData.project_type,
+          project_focus: mappedData.project_focus,
           audience_faqs: mappedData.audience_faqs,
         };
 
@@ -108,51 +115,95 @@ export const KeyWordGenerator = () => {
             console.log("The request has already been sent. Skipping...");
           } else {
             // Send the keywords to the googleAdsGenerateKeywords API route
-            const response = await fetch("/api/googleAdsGenerateKeywords", {
+
+            await fetch("/api/googleAdsGenerateKeywords", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
               },
               body: JSON.stringify({ keywords: gptKeywords }),
-            });
+            })
+              .then(response => response.json())
+              .then(async data => {
+                const csvData = data.csvResultArray;
+                const resultID = data.resultID;
+                const resultAmount = data.resultAmount;
 
-            const csvData = await response.text();
+                console.log("CSV DATA CLIENT:", csvData);
 
-            const { data: uploadData, error: uploadError } =
-              await supabase.storage
-                .from("google-keywords-csv")
-                .upload(
-                  `${user?.user?.id}/${gptKeywords?.[0].keyword_generator_id}.csv`,
-                  csvData,
-                  { contentType: "text/csv" },
-                );
+                console.log("DATA FOR SERO TRANSACTION RESULT ID:", resultID);
 
-            //todo: add in secure policy to supabase before going live.
+                // Convert promptData.project_type to lower case and replace spaces with underscores
+                const formattedPageType = promptData.project_type
+                  .toLowerCase()
+                  .replace(/ /g, "_");
 
-            if (uploadError) {
-              console.error("Error uploading CSV to Supabase: ", uploadError);
-            } else {
-              console.log("CSV uploaded to Supabase: ", uploadData);
-            }
+                const { data: uploadData, error: uploadError } =
+                  await supabase.storage
+                    .from("google-keywords-csv")
+                    .upload(
+                      `${user?.user?.id}/${formattedPageType}/${resultID}_${gptKeywords?.[0].keyword_generator_id}.csv`,
+                      csvData,
+                      { contentType: "text/csv" },
+                    );
 
-            // After sending the request, update the has_been_posted_to_api field to true
-            const { error: updateError } = await supabase
-              .from("gpt_keyword_results")
-              .update({ has_been_posted_to_api: true })
-              .eq("id", gptKeywords?.[0].id);
+                //todo: add in secure policy to supabase before going live.
 
-            if (updateError) {
-              console.error(
-                "Error updating has_been_posted_to_api: ",
-                updateError,
-              );
-            }
+                if (uploadError) {
+                  console.error(
+                    "Error uploading CSV to Supabase: ",
+                    uploadError,
+                  );
+                } else {
+                  console.log("CSV uploaded to Supabase: ", uploadData);
+                }
+
+                const { data: projectData, error: projectError } =
+                  await supabase.from("projects").insert([
+                    {
+                      user_id: user?.user?.id,
+                      csv_file_path: `${user?.user?.id}/${formattedPageType}/${resultID}_${gptKeywords?.[0].keyword_generator_id}.csv`,
+                      project_type: formattedPageType,
+                      keyword_generator_prompt_id:
+                        gptKeywords?.[0].keyword_generator_id,
+                      gpt_keywords_id: gptKeywords?.[0].id,
+                      amount_of_keywords: resultAmount,
+                      gpt_keyword_sample: gptKeywords?.[0].gpt_response,
+                    },
+                  ]);
+
+                if (projectError) {
+                  console.error(
+                    "Error logging project data to Supabase: ",
+                    projectError,
+                  );
+                } else {
+                  console.log("project data logged to Supabase: ", projectData);
+                }
+
+                // After sending the request, update the has_been_posted_to_api field to true
+                const { error: updateError } = await supabase
+                  .from("gpt_keyword_results")
+                  .update({ has_been_posted_to_api: true })
+                  .eq("id", gptKeywords?.[0].id);
+
+                if (updateError) {
+                  console.error(
+                    "Error updating has_been_posted_to_api: ",
+                    updateError,
+                  );
+                }
+              })
+              .catch(error => {
+                console.error("Error:", error);
+              });
 
             restartProcess();
           }
         }
       }
     }
+    setIsLoading(false);
   };
 
   const restartProcess = () => {
@@ -160,7 +211,13 @@ export const KeyWordGenerator = () => {
   };
 
   return (
-    <div className="rounded-3xl bg-gray-800 px-6 pt-6">
+    <div className=" relative rounded-3xl bg-gray-800 px-6 pt-6">
+      {isLoading && (
+        <div className="absolute ml-7 flex h-full w-3/4 items-center justify-center rounded-3xl ">
+          <HashLoader color={"#6B46C1"} loading={isLoading} size={50} />
+        </div>
+      )}
+
       <div className="flex pb-6 text-2xl font-bold text-white">
         <p>Generate Keywords</p>
       </div>

@@ -1,5 +1,5 @@
 import { Content } from "../components/Content";
 
 export default function HomePage() {
-  return <Content title="Home" />;
+  return <Content title="Home: SEO Keyword Projects" />;
 }
