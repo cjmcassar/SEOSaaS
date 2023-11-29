@@ -1,6 +1,5 @@
-//todo: make this grab the data from supabase to show the cards
-
 import { supabase } from "@/utils/supabaseClient";
+
 import { ProjectCardProps } from "./Content";
 
 export const ProjectCard = ({ data }: ProjectCardProps) => {
