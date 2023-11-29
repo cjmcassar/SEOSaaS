@@ -54,6 +54,8 @@ export function Content(props: ContentProps) {
         { event: "INSERT", schema: "public", table: "projects" },
         payload => {
           console.log("Change received!", payload);
+
+          fetchProjects();
         },
       )
       .subscribe();
@@ -88,7 +90,7 @@ export function Content(props: ContentProps) {
             </div>
           </div>
         </div>
-        <div className="flex flex-wrap">
+        <div className="ProjectCardDiv flex flex-wrap">
           {projects?.map(project => (
             <ProjectCard key={project.id} data={project} />
           ))}
