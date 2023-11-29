@@ -1,8 +1,10 @@
 import { useCallback, useContext, useEffect, useState } from "react";
-import { KeyWordGenerator } from "./KeywordGenerator";
-import { ProjectCard } from "./ProjectCard";
+
 import { UserContext } from "@/contexts/UserContext";
 import { supabase } from "@/utils/supabaseClient";
+
+import { KeyWordGenerator } from "./KeywordGenerator";
+import { ProjectCard } from "./ProjectCard";
 
 interface ContentProps {
   title: string;

@@ -1,8 +1,10 @@
+import router from "next/router";
 import React, { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { profileSetupQuestions } from "./data/ProfileSetupQuestions";
+
 import { supabase } from "@/utils/supabaseClient";
-import router from "next/router";
+
+import { profileSetupQuestions } from "./data/ProfileSetupQuestions";
 
 type FormValues = {
   industry_served: string;
@@ -15,8 +17,6 @@ type FormValues = {
   key_features_benefits: string;
   created_profile: boolean;
 };
-
-//Todo: fix bug where initial profile input data is null
 
 export const ProfileSetup = () => {
   const { register, handleSubmit } = useForm<FormValues>();

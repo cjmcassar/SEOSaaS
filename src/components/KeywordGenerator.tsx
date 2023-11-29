@@ -1,11 +1,12 @@
 import React, { useContext, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { keyWordQuestionSteps } from "./data/KeywordQuestions";
-import { supabase } from "@/utils/supabaseClient";
+import { HashLoader } from "react-spinners";
 
 import { ProfileInfoContext } from "@/contexts/ProfileInfoContext";
 import { UserContext } from "@/contexts/UserContext";
-import { HashLoader } from "react-spinners";
+import { supabase } from "@/utils/supabaseClient";
+
+import { keyWordQuestionSteps } from "./data/KeywordQuestions";
 
 type FormValues = {
   // Define your form fields here. For example:

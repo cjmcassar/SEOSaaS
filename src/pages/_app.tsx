@@ -1,15 +1,16 @@
 import { AppProps } from "next/app";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
 import Head from "next/head";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 
 import "tailwindcss/tailwind.css";
 
-import { DashboardLayout } from "@/dashboard/Layout";
 import { ProfileSetup } from "@/components/ProfileSetup";
-import { supabase } from "../utils/supabaseClient";
-import { UserContext, User } from "@/contexts/UserContext";
 import { ProfileInfoContext, ProfileInfo } from "@/contexts/ProfileInfoContext";
+import { UserContext, User } from "@/contexts/UserContext";
+import { DashboardLayout } from "@/dashboard/Layout";
+
+import { supabase } from "../utils/supabaseClient";
 
 //TODO: Add in supabase policies for database and storage
 

@@ -1,6 +1,7 @@
-import { getAuthHeader } from "@/utils/dataForSeoAuth";
 import { parse } from "json2csv";
 import { NextApiRequest, NextApiResponse } from "next";
+
+import { getAuthHeader } from "@/utils/dataForSeoAuth";
 
 export default async function handler(
   req: NextApiRequest,
