@@ -5,14 +5,15 @@ import { supabase } from "@/utils/supabaseClient";
 import router from "next/router";
 
 type FormValues = {
-  businessModel: string;
-  profitableProducts: string;
-  targetAudience: string;
-  competitorsContent: string;
-  valueProposition: string;
-  businessObjectives: string;
-  keyFeatures: string;
-  industry: string;
+  industry_served: string;
+  business_model: string;
+  profitable_products_services: string;
+  target_audience_ideal_customer: string;
+  competitors_relevant_content: string;
+  unique_value_proposition: string;
+  primary_business_objectives: string;
+  key_features_benefits: string;
+  created_profile: boolean;
 };
 
 //Todo: fix bug where initial profile input data is null
@@ -27,22 +28,25 @@ export const ProfileSetup = () => {
       setStep(prevStep => prevStep + 1);
     } else {
       const mappedData = {
-        industry_served: data.industry,
-        business_model: data.businessModel,
-        profitable_products_services: data.profitableProducts,
-        target_audience_ideal_customer: data.targetAudience,
-        competitors_relevant_content: data.competitorsContent,
-        unique_value_proposition: data.valueProposition,
-        primary_business_objectives: data.businessObjectives,
-        key_features_benefits: data.keyFeatures,
+        industry_served: data.industry_served,
+        business_model: data.business_model,
+        profitable_products_services: data.profitable_products_services,
+        target_audience_ideal_customer: data.target_audience_ideal_customer,
+        competitors_relevant_content: data.competitors_relevant_content,
+        unique_value_proposition: data.unique_value_proposition,
+        primary_business_objectives: data.primary_business_objectives,
+        key_features_benefits: data.key_features_benefits,
         created_profile: true,
       };
-      const { error } = await supabase.from("profiles").insert([
-        {
-          user_id: (await supabase.auth.getUser()).data.user?.id,
-          ...mappedData,
-        },
-      ]);
+      console.log("mapped data:", mappedData);
+      const { data: uploadedData, error } = await supabase
+        .from("profiles")
+        .insert([
+          {
+            user_id: (await supabase.auth.getUser()).data.user?.id,
+            ...mappedData,
+          },
+        ]);
 
       if (error) {
         console.error("Error inserting data: ", error);
@@ -85,7 +89,7 @@ export const ProfileSetup = () => {
                   >
                     {stepItem.question}
                   </label>
-                  {stepItem.name !== "createYourProfile" && (
+                  {stepItem.name !== "created_profile" && (
                     <textarea
                       className="mt-6 h-24 w-full rounded border p-2"
                       id={stepItem.name}
