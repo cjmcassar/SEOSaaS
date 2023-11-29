@@ -34,7 +34,8 @@
 		"openai": "^4.16.1",
 		"react": "18.2.0",
 		"react-dom": "18.2.0",
-		"react-hook-form": "^7.48.2"
+		"react-hook-form": "^7.48.2",
+		"react-spinners": "^0.13.8"
 	},
 	"devDependencies": {
 		"@types/json2csv": "^5.0.7",
