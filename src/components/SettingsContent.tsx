@@ -1,8 +1,12 @@
+import _ from "lodash";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { profileSetupQuestions } from "./data/ProfileSetupQuestions";
+import { toast, ToastContainer } from "react-toastify";
+
 import { supabase } from "@/utils/supabaseClient"; // Import the supabase client
-import _ from "lodash";
+
+import { profileSetupQuestions } from "./data/ProfileSetupQuestions";
+import "react-toastify/dist/ReactToastify.css";
 
 type FormValues = {
   industry_served: string;
@@ -35,7 +39,7 @@ export const SettingsContent: React.FC = () => {
     const fetchData = async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select() // replace 'column_name' with the name of the column you want to fetch
+        .select()
         .eq("user_id", (await supabase.auth.getUser()).data.user?.id)
         .single();
 
@@ -43,7 +47,7 @@ export const SettingsContent: React.FC = () => {
         console.error("Error fetching data: ", error);
       } else {
         console.log("placehodler data:", data);
-        setPlaceholderData(data); // replace 'column_name' with the name of the column you fetched
+        setPlaceholderData(data);
       }
     };
 
@@ -75,13 +79,16 @@ export const SettingsContent: React.FC = () => {
 
     if (error) {
       console.error("Error inserting data: ", error);
+      toast.error("Error inserting data: " + error.message);
     } else {
       console.log("Data inserted successfully!");
+      toast.success("Profile updated successfully!");
     }
   };
 
   return (
     <div className="flex h-screen flex-wrap rounded-3xl bg-gray-800 p-5">
+      <ToastContainer className="z-10" />
       <div className="h-max w-full rounded-3xl bg-white p-5 shadow-md">
         <h2 className="mb-4 text-center text-2xl font-bold">
           Profile Settings
