@@ -11,6 +11,8 @@ import { supabase } from "../utils/supabaseClient";
 import { UserContext, User } from "@/contexts/UserContext";
 import { ProfileInfoContext, ProfileInfo } from "@/contexts/ProfileInfoContext";
 
+//TODO: Add in supabase policies for database and storage
+
 function MyApp({ Component, pageProps }: AppProps) {
   const [user, setUser] = useState<User | null>(null);
   const [isProfileSetupComplete, setProfileSetupComplete] = useState();

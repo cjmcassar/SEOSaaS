@@ -15,6 +15,8 @@ type FormValues = {
   industry: string;
 };
 
+//Todo: fix bug where initial profile input data is null
+
 export const ProfileSetup = () => {
   const { register, handleSubmit } = useForm<FormValues>();
   const [step, setStep] = useState(1);
