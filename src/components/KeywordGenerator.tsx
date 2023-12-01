@@ -11,15 +11,10 @@ import { keyWordQuestionSteps } from "./data/KeywordQuestions";
 import "react-toastify/dist/ReactToastify.css";
 
 type FormValues = {
-  // Define your form fields here. For example:
-
   contentType: string;
   contentFocus: string;
   audienceFAQs: string;
-  // Add more fields as needed
 };
-
-//TODO: add in a wait wheel until the data is finished procuessing
 
 export const KeyWordGenerator = () => {
   const profileInfo = useContext(ProfileInfoContext);
@@ -60,11 +55,9 @@ export const KeyWordGenerator = () => {
           audience_faqs: mappedData.audience_faqs,
         };
 
-        const prompt = `SEO marketer with profile ${JSON.stringify(
-          profileInfo,
-        )} is seeking to generate exactly 10 keywords for their company. The provided data for this task is ${JSON.stringify(
+        const prompt = `The provided data for this task is ${JSON.stringify(
           promptData,
-        )}. Please provide the SEO keyword suggestions as a continuous text, separated by commas, and not as a list or numbered items. Only return the keywords, no other descriptions or assistant text is necessary.`;
+        )}.`;
 
         const gptResponse = await fetch("/api/gptResponse", {
           method: "POST",
@@ -76,10 +69,11 @@ export const KeyWordGenerator = () => {
 
         const data = await gptResponse.json();
 
-        const gptResponseWords = data.choices?.[0].message.content.split(", ");
+        const gptResponseWords =
+          data?.data?.[0].content?.[0].text.value.split(", ");
         if (gptResponseWords.length > 10) {
-          data.choices[0].message.content = gptResponseWords
-            .slice(0, 10)
+          data.data[0].content[0].text.value = gptResponseWords
+            .slice(0, 50)
             .join(", ");
         }
 
@@ -88,7 +82,7 @@ export const KeyWordGenerator = () => {
           .insert([
             {
               keyword_generator_id: keywordGenPromptId,
-              gpt_response: data.choices?.[0].message.content,
+              gpt_response: data?.data?.[0].content?.[0].text.value,
               user_id: user?.user?.id,
             },
           ])
@@ -245,14 +239,27 @@ export const KeyWordGenerator = () => {
           {keyWordQuestionSteps.map(
             (stepItem, index) =>
               index + 1 === step && (
-                <div key={stepItem.id} className="flex flex-col ">
+                <div key={stepItem.id} className="flex flex-col">
                   <label
                     htmlFor={stepItem.name}
                     className="mb-2 mt-4 text-white"
                   >
                     {stepItem.question}
                   </label>
-                  {stepItem.name !== "finalStep" && (
+                  {stepItem.type === "dropdown" ? (
+                    <select
+                      className="mt-6 w-full rounded border p-2"
+                      id={stepItem.name}
+                      required={stepItem.validation.required}
+                      {...register(stepItem.name as keyof FormValues)}
+                    >
+                      {stepItem.options.map(option => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  ) : stepItem.name !== "finalStep" ? (
                     <textarea
                       className="mt-6 h-24 w-full rounded border p-2"
                       id={stepItem.name}
@@ -260,7 +267,7 @@ export const KeyWordGenerator = () => {
                       required={stepItem.validation.required}
                       {...register(stepItem.name as keyof FormValues)}
                     />
-                  )}
+                  ) : null}
                 </div>
               ),
           )}

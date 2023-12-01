@@ -18,7 +18,7 @@ export default async function handler(
 
   try {
     const postResponse = await fetch(
-      "https://api.dataforseo.com/v3/keywords_data/google_ads/keywords_for_keywords/task_post",
+      "https://api.dataforseo.com/v3/keywords_data/google_ads/search_volume/task_post",
       {
         method: "POST",
         headers: {
@@ -58,7 +58,7 @@ export default async function handler(
     }
 
     const getResponse = await fetch(
-      "https://api.dataforseo.com/v3/keywords_data/google_ads/keywords_for_keywords/task_get/" +
+      "https://api.dataforseo.com/v3/keywords_data/google_ads/search_volume/task_get/" +
         taskId,
       {
         method: "GET",

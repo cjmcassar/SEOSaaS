@@ -1,7 +1,9 @@
 import router from "next/router";
 import { useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
 
 import { supabase } from "../../utils/supabaseClient";
+import "react-toastify/dist/ReactToastify.css";
 
 interface Props {
   onClose: () => void;
@@ -14,27 +16,49 @@ const LoginOrSignup: React.FC<Props> = ({ onClose }) => {
 
   const handleSignUp = async (event: { preventDefault: () => void }) => {
     event.preventDefault();
-    await supabase.auth.signUp({
+    setLoading(true);
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: {
-        emailRedirectTo: `${location.origin}/`,
-      },
     });
-    router.reload();
+
+    if (error) {
+      toast.error(error.message); // Show error message if there's an error
+    } else if (!data.user) {
+      toast.info("Check your email to complete registration!"); // Notify user to check email
+    } else {
+      toast.success("Check your email to complete registration!");
+    }
+
+    setLoading(false);
+    setTimeout(() => {
+      router.reload();
+    }, 2000);
   };
 
   const handleSignIn = async (event: { preventDefault: () => void }) => {
     event.preventDefault();
-    await supabase.auth.signInWithPassword({
+    setLoading(true);
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
-    router.reload();
+
+    if (error) {
+      toast.error(`${error.message} or Email doesn't exist!`); // Show error message if there's an error
+    } else if (data.user) {
+      toast.success("Logged in successfully");
+    }
+
+    setLoading(false);
+    setTimeout(() => {
+      router.reload();
+    }, 2000);
   };
 
   return (
     <div className="fixed left-5 top-10 z-50 flex h-full w-full items-center justify-center">
+      <ToastContainer position="top-center" />
       <div className="rounded-lg bg-gray-800 p-6 text-white">
         <h2 className="mb-4 text-2xl font-bold">Login / Signup</h2>
         <form onSubmit={handleSignUp} className="space-y-4">

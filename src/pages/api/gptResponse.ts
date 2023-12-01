@@ -8,9 +8,16 @@ export default async function handler(
   res: NextApiResponse,
 ) {
   if (req.method === "POST") {
-    const prompt = req.body.prompt;
-    const gptResponse = await getGptResponse(prompt);
-    res.status(200).json(gptResponse);
+    try {
+      // const prompt = "give me some keywords for a e-commerce website";
+      const prompt = req.body.prompt; // Uncomment this when you want to use request body
+      const gptResponse = await getGptResponse(prompt);
+
+      res.status(200).json(gptResponse);
+    } catch (error) {
+      console.error("Error:", error);
+      res.status(500).json({ message: "Internal Server Error" });
+    }
   } else {
     res.status(405).json({ message: "Method not allowed" });
   }
