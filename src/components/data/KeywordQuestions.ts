@@ -2,9 +2,11 @@ export const keyWordQuestionSteps = [
   {
     id: 1,
     question:
-      "Are the keywords for your homepage, landing page, product page or blog post?",
+      "Are the keywords for your homepage, landing page, product page, or blog post?",
     name: "contentType",
-    placeholder: "Your answer",
+    type: "dropdown", // Specify that this is a dropdown type question
+    options: ["Homepage", "Landing Page", "Product Page", "Blog Post"],
+    placeholder: "Select an option",
     validation: { required: true },
   },
   {
