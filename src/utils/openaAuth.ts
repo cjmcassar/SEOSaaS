@@ -66,7 +66,7 @@ export async function getGptResponse(prompt: string) {
         throw new Error(`Response ${checkStatusOfResponse.last_error}`);
       }
 
-      await delay(1000);
+      await delay(500);
     }
   } catch (error: any) {
     throw new Error(`Error during run status check: ${error.message}`);
