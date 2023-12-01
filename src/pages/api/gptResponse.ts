@@ -16,7 +16,7 @@ export default async function handler(
       res.status(200).json(gptResponse);
     } catch (error) {
       console.error("Error:", error);
-      res.status(500).json({ message: "Internal Server Error" });
+      res.status(500).json({ message: "Internal Server Error:", error });
     }
   } else {
     res.status(405).json({ message: "Method not allowed" });
