@@ -41,7 +41,7 @@ export async function getGptResponse(prompt: string) {
     throw new Error(`Failed to create OpenAI run: ${error.message}`);
   }
 
-  const maxTimeout = 10000; // e.g., 10 seconds
+  const maxTimeout = 4000; // e.g., 10 seconds
   const startTime = Date.now();
   let checkStatusOfResponse;
   try {
