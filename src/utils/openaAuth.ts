@@ -9,42 +9,29 @@ function delay(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+//TODO: revamp this to make it faster. This will fix the main issue. I believe things can be taken away instead of added
+
 export async function getGptResponse(prompt: string) {
   if (!process.env.OPENAI_API_KEY || !process.env.OPENAI_ASSISTANT_ID) {
     throw new Error("Missing OpenAI credentials");
   }
 
-  let keyFindGPTAssistant;
   try {
-    keyFindGPTAssistant = await openai.beta.assistants.retrieve(
-      process.env.OPENAI_ASSISTANT_ID,
-    );
-  } catch (error: any) {
-    throw new Error(`Failed to retrieve OpenAI Assistant: ${error.message}`);
-  }
+    const [keyFindGPTAssistant, thread] = await Promise.all([
+      openai.beta.assistants.retrieve(process.env.OPENAI_ASSISTANT_ID),
+      openai.beta.threads.create({
+        messages: [{ role: "user", content: prompt }],
+      }),
+    ]);
 
-  let thread;
-  try {
-    thread = await openai.beta.threads.create({
-      messages: [{ role: "user", content: prompt }],
-    });
-  } catch (error: any) {
-    throw new Error(`Failed to create OpenAI thread: ${error.message}`);
-  }
-
-  let run;
-  try {
-    run = await openai.beta.threads.runs.create(thread.id, {
+    const run = await openai.beta.threads.runs.create(thread.id, {
       assistant_id: keyFindGPTAssistant.id,
     });
-  } catch (error: any) {
-    throw new Error(`Failed to create OpenAI run: ${error.message}`);
-  }
 
-  const maxTimeout = 20000; // e.g., 10 seconds
-  const startTime = Date.now();
-  let checkStatusOfResponse;
-  try {
+    const maxTimeout = 10000; // e.g., 10 seconds
+    const startTime = Date.now();
+    let checkStatusOfResponse;
+
     while (true) {
       if (Date.now() - startTime > maxTimeout) {
         throw new Error("Response timed out");
@@ -66,20 +53,15 @@ export async function getGptResponse(prompt: string) {
         throw new Error(`Response ${checkStatusOfResponse.last_error}`);
       }
 
-      await delay(500);
+      await delay(1000);
     }
-  } catch (error: any) {
-    throw new Error(`Error during run status check: ${error.message}`);
-  }
 
-  let gptAssistantResponse;
-  try {
-    gptAssistantResponse = await openai.beta.threads.messages.list(
+    const gptAssistantResponse = await openai.beta.threads.messages.list(
       run.thread_id,
     );
+
+    return gptAssistantResponse;
   } catch (error: any) {
     throw new Error(`Failed to retrieve OpenAI response: ${error.message}`);
   }
-
-  return gptAssistantResponse;
 }
