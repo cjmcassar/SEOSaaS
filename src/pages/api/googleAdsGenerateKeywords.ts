@@ -96,9 +96,20 @@ export default async function handler(
 
     const resultArray = getFetchResults.tasks[0].result;
 
+    // Filter results with 0 or no search volume data
+    const filteredResults = resultArray.filter(
+      (item: { search_volume: number }) => item.search_volume > 0,
+    );
+
     const resultID = getFetchResults.tasks[0].id;
 
-    const csvResultArray = parse(resultArray);
+    // Order the filtered results by search volume in descending order
+    const orderedResults = filteredResults.sort(
+      (a: { search_volume: number }, b: { search_volume: number }) =>
+        b.search_volume - a.search_volume,
+    );
+
+    const csvResultArray = parse(orderedResults);
 
     res.setHeader("Content-Type", "text/csv");
     res.status(200).json({ csvResultArray, resultID, resultAmount });
