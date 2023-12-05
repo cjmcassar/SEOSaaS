@@ -28,7 +28,7 @@ export async function getGptResponse(prompt: string) {
       assistant_id: keyFindGPTAssistant.id,
     });
 
-    const maxTimeout = 10000; // e.g., 10 seconds
+    const maxTimeout = 20000; // e.g., 10 seconds
     const startTime = Date.now();
     let checkStatusOfResponse;
 
