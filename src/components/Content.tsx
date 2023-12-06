@@ -1,5 +1,6 @@
 import { useCallback, useContext, useEffect, useState } from "react";
 
+import { SearchContext } from "@/contexts/SearchContext";
 import { UserContext } from "@/contexts/UserContext";
 import { supabase } from "@/utils/supabaseClient";
 
@@ -27,7 +28,7 @@ export interface ProjectCardProps {
 export function Content(props: ContentProps) {
   const [projects, setProjects] = useState<ProjectData[] | null>(null);
   const user = useContext(UserContext);
-  console.log("user:", user);
+  const { searchTerm } = useContext(SearchContext);
 
   const fetchProjects = useCallback(async () => {
     if (user) {
@@ -64,6 +65,12 @@ export function Content(props: ContentProps) {
     };
   }, [fetchProjects]);
 
+  const filteredProjects = projects?.filter(project =>
+    project.gpt_keyword_sample.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
+
+  console.log("projects:", projects);
+
   if (!projects) return <div>Loading...</div>;
   //TODO: update this to grab the data from supabase or something
 
@@ -91,7 +98,7 @@ export function Content(props: ContentProps) {
           </div>
         </div>
         <div className="flex flex-wrap">
-          {projects?.map(project => (
+          {filteredProjects?.map(project => (
             <ProjectCard key={project.id} data={project} />
           ))}
         </div>
