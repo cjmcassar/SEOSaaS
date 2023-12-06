@@ -1,4 +1,7 @@
+import { useContext } from "react";
+
 import { ProfileIcon } from "@/components/ProfileIcon";
+import { SearchContext } from "@/contexts/SearchContext";
 
 import { useDashboardContext } from "./Provider";
 
@@ -44,6 +47,8 @@ const SearchIcon = () => (
 
 export function TopBar() {
   const { openSidebar } = useDashboardContext();
+  const { setSearchTerm } = useContext(SearchContext);
+
   return (
     <header className="relative z-10 h-20 items-center">
       <div className="relative z-10 mx-auto flex h-full flex-col justify-center px-3 text-white">
@@ -60,7 +65,8 @@ export function TopBar() {
               <input
                 type="text"
                 className="block w-full rounded-2xl bg-gray-800 py-1.5 pl-10 pr-4 leading-normal text-gray-400 opacity-90 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Search"
+                placeholder="Search by sample keywords"
+                onChange={event => setSearchTerm(event.target.value)}
               />
             </div>
           </div>
