@@ -7,6 +7,7 @@ import "tailwindcss/tailwind.css";
 
 import { ProfileSetup } from "@/components/ProfileSetup";
 import { ProfileInfoContext, ProfileInfo } from "@/contexts/ProfileInfoContext";
+import { SearchContext } from "@/contexts/SearchContext";
 import { UserContext, User } from "@/contexts/UserContext";
 import { DashboardLayout } from "@/dashboard/Layout";
 
@@ -18,6 +19,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   const [user, setUser] = useState<User | null>(null);
   const [isProfileSetupComplete, setProfileSetupComplete] = useState();
   const [profileInfo, setProfileInfo] = useState<ProfileInfo | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
   const router = useRouter();
 
   useEffect(() => {
@@ -65,19 +67,23 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <UserContext.Provider value={{ user, setUser }}>
       <ProfileInfoContext.Provider value={{ profileInfo, setProfileInfo }}>
-        <Head>
-          <title>KeyFind</title>
-        </Head>
+        <SearchContext.Provider value={{ searchTerm, setSearchTerm }}>
+          <Head>
+            <title>KeyFind</title>
+          </Head>
 
-        <DashboardLayout>
-          <div className="flex justify-center">
-            {!isProfileSetupComplete && user ? <ProfileSetup /> : null}
-          </div>
-          {!isProfileSetupComplete && !user ? (
-            <Component {...pageProps} />
-          ) : null}
-          {isProfileSetupComplete && user ? <Component {...pageProps} /> : null}
-        </DashboardLayout>
+          <DashboardLayout>
+            <div className="flex justify-center">
+              {!isProfileSetupComplete && user ? <ProfileSetup /> : null}
+            </div>
+            {!isProfileSetupComplete && !user ? (
+              <Component {...pageProps} />
+            ) : null}
+            {isProfileSetupComplete && user ? (
+              <Component {...pageProps} />
+            ) : null}
+          </DashboardLayout>
+        </SearchContext.Provider>
       </ProfileInfoContext.Provider>
     </UserContext.Provider>
   );
