@@ -28,15 +28,9 @@ export async function getGptResponse(prompt: string) {
       assistant_id: keyFindGPTAssistant.id,
     });
 
-    // const maxTimeout = 10000; // e.g., 10 seconds
-    // const startTime = Date.now();
     let checkStatusOfResponse;
 
     while (true) {
-      // if (Date.now() - startTime > maxTimeout) {
-      //   throw new Error("Response timed out");
-      // }
-
       checkStatusOfResponse = await openai.beta.threads.runs.retrieve(
         thread.id,
         run.id,
@@ -52,8 +46,6 @@ export async function getGptResponse(prompt: string) {
       ) {
         throw new Error(`Response ${checkStatusOfResponse.last_error}`);
       }
-
-      // await delay(1000);
     }
 
     const gptAssistantResponse = await openai.beta.threads.messages.list(
