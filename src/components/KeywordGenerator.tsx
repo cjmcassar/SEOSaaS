@@ -10,6 +10,7 @@ import { keyWordQuestionSteps } from "./data/KeywordQuestions";
 import "react-toastify/dist/ReactToastify.css";
 
 type FormValues = {
+  contentName: string;
   contentType: string;
   contentFocus: string;
   audienceFAQs: string;
@@ -29,6 +30,7 @@ export const KeyWordGenerator = () => {
       setStep(prevStep => prevStep + 1);
     } else {
       const mappedData = {
+        project_name: data.contentName,
         project_type: data.contentType,
         project_focus: data.contentFocus,
         audience_faqs: data.audienceFAQs,
@@ -162,6 +164,7 @@ export const KeyWordGenerator = () => {
                     {
                       user_id: user?.user?.id,
                       csv_file_path: `${user?.user?.id}/${formattedPageType}/${resultID}_${gptKeywords?.[0].keyword_generator_id}.csv`,
+                      project_name: mappedData.project_name,
                       project_type: formattedPageType,
                       keyword_generator_prompt_id:
                         gptKeywords?.[0].keyword_generator_id,
