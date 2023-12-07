@@ -30,10 +30,11 @@ export const ProjectCard = ({ data }: ProjectCardProps) => {
           <div className="flex justify-center">
             <span className="text-sm">{formattedDate}</span>
           </div>
+          <div className="text-center text-2xl font-bold">
+            {data.project_name}
+          </div>
           <div className="mb-4 mt-5 text-center">
-            <p className="text-base font-bold opacity-70">
-              {formattedProjectType}
-            </p>
+            <p className="text-base opacity-70">{formattedProjectType}</p>
             <p className=" opacity-70">Sample Keywords:</p>
             <p
               className="mt-2 truncate text-sm opacity-70"
