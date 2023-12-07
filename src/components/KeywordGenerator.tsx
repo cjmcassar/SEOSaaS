@@ -3,7 +3,6 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { HashLoader } from "react-spinners";
 import { ToastContainer, toast } from "react-toastify";
 
-import { ProfileInfoContext } from "@/contexts/ProfileInfoContext";
 import { UserContext } from "@/contexts/UserContext";
 import { supabase } from "@/utils/supabaseClient";
 
@@ -17,7 +16,6 @@ type FormValues = {
 };
 
 export const KeyWordGenerator = () => {
-  const profileInfo = useContext(ProfileInfoContext);
   const user = useContext(UserContext);
   const { register, handleSubmit } = useForm<FormValues>();
   const [step, setStep] = useState(1);
@@ -36,6 +34,10 @@ export const KeyWordGenerator = () => {
         audience_faqs: data.audienceFAQs,
         user_id: user?.user?.id,
       };
+
+      const toastId = toast.loading(
+        "Generating your keyword list may take up to 60 seconds. Don’t close this tab while we generate your keywords.",
+      );
 
       const { data: keywordGenPrompt, error } = await supabase
         .from("keyword_gen_prompt")
@@ -189,14 +191,22 @@ export const KeyWordGenerator = () => {
                     updateError,
                   );
                 } else {
-                  toast.success(
-                    `${promptData.project_type} project was created!`,
-                  );
+                  toast.update(toastId, {
+                    render: `${promptData.project_type} project was created!`,
+                    type: "success",
+                    isLoading: false,
+                    autoClose: 5000,
+                  });
                 }
               })
               .catch(error => {
                 console.error("Error:", error);
-                toast.error("Error:", error);
+                toast.update(toastId, {
+                  render: `Error:, ${error}`,
+                  type: "error",
+                  isLoading: false,
+                  autoClose: 5000,
+                });
               });
 
             restartProcess();
@@ -213,7 +223,7 @@ export const KeyWordGenerator = () => {
 
   return (
     <div className=" relative rounded-3xl bg-gray-800 px-6 pt-6">
-      <ToastContainer className="z-10" />
+      <ToastContainer autoClose={8000} className="z-10" />
       {isLoading && (
         <div className="absolute ml-7 flex h-full w-3/4 items-center justify-center rounded-3xl ">
           <HashLoader color={"#6B46C1"} loading={isLoading} size={50} />
