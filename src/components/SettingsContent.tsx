@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast, ToastContainer } from "react-toastify";
 
-import { supabase } from "@/utils/supabaseClient"; // Import the supabase client
+import { supabase } from "@/utils/supabaseClient";
 
 import { profileSetupQuestions } from "./data/ProfileSetupQuestions";
 import "react-toastify/dist/ReactToastify.css";
