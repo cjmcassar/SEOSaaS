@@ -15,6 +15,7 @@ interface ProjectData {
   id: string;
   title: string;
   created_at: string;
+  project_name: string;
   project_type: string;
   gpt_keyword_sample: string;
   csv_file_path: string;
@@ -72,7 +73,11 @@ export function Content(props: ContentProps) {
   console.log("projects:", projects);
 
   if (!projects) return <div>Loading...</div>;
-  //TODO: update this to grab the data from supabase or something
+
+  //todo: 1.
+  // 2. add in ability to edit current projects
+  // 3. add in abaility to delete current projects
+  // 4. add in country selection
 
   return (
     <div className="flex flex-wrap">
