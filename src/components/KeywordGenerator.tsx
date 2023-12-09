@@ -24,6 +24,189 @@ export const KeyWordGenerator = () => {
 
   //TODO: come back and refactor this monstrosity
 
+  // const mapFormData = (data: FormValues, userId: string | undefined) => {
+  //   return {
+  //     project_name: data.contentName,
+  //     project_type: data.contentType,
+  //     project_focus: data.contentFocus,
+  //     audience_faqs: data.audienceFAQs,
+  //     user_id: userId,
+  //   };
+  // };
+
+  // const generateKeywords = async (mappedData: any) => {
+  //   const { data: keywordGenPrompt, error } = await supabase
+  //     .from("keyword_gen_prompt")
+  //     .insert([mappedData])
+  //     .select();
+
+  //   if (error) {
+  //     console.error("Error inserting data: ", error);
+  //     return null;
+  //   }
+
+  //   return keywordGenPrompt;
+  // };
+
+  // const handleGptResponse = async (
+  //   promptData: any,
+  //   keywordGenPromptId: string,
+  // ) => {
+  //   const prompt = `The provided data for this task is ${JSON.stringify(
+  //     promptData,
+  //   )}.`;
+
+  //   const gptResponse = await fetch("/api/gptResponse", {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify({ prompt }),
+  //   });
+
+  //   const data = await gptResponse.json();
+
+  //   const gptResponseWords =
+  //     data?.data?.[0].content?.[0].text.value.split(", ");
+  //   if (gptResponseWords.length > 10) {
+  //     data.data[0].content[0].text.value = gptResponseWords
+  //       .slice(0, 50)
+  //       .join(", ");
+  //   }
+
+  //   const { data: gptResponseData, error: gptError } = await supabase
+  //     .from("gpt_keyword_results")
+  //     .insert([
+  //       {
+  //         keyword_generator_id: keywordGenPromptId,
+  //         gpt_response: data?.data?.[0].content?.[0].text.value,
+  //         user_id: user?.user?.id,
+  //       },
+  //     ])
+  //     .select();
+
+  //   if (gptError) {
+  //     console.error("Error inserting GPT response: ", gptError);
+  //   }
+
+  //   return gptResponseData;
+  // };
+
+  // const postKeywords = async (gptKeywords: any, promptData: any) => {
+  //   if (gptKeywords?.[0].has_been_posted_to_api) {
+  //     console.log("The request has already been sent. Skipping...");
+  //   } else {
+  //     await fetch("/api/googleAdsGenerateKeywords", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({ keywords: gptKeywords }),
+  //     })
+  //       .then(response => response.json())
+  //       .then(async data => {
+  //         // Handle the response from the Google Ads API here...
+  //       })
+  //       .catch(error => {
+  //         console.error("Error:", error);
+  //       });
+
+  //     // After sending the request, update the has_been_posted_to_api field to true
+  //     const { error: updateError } = await supabase
+  //       .from("gpt_keyword_results")
+  //       .update({ has_been_posted_to_api: true })
+  //       .eq("id", gptKeywords?.[0].id);
+
+  //     if (updateError) {
+  //       console.error("Error updating has_been_posted_to_api: ", updateError);
+  //     }
+  //   }
+  // };
+
+  // const createProject = async (
+  //   mappedData: any,
+  //   gptKeywords: any,
+  //   resultID: string,
+  //   resultAmount: number,
+  //   promptData: any,
+  // ) => {
+  //   // Convert promptData.project_type to lower case and replace spaces with underscores
+  //   const formattedPageType = promptData.project_type
+  //     .toLowerCase()
+  //     .replace(/ /g, "_");
+
+  //   const { data: uploadData, error: uploadError } = await supabase.storage
+  //     .from("google-keywords-csv")
+  //     .upload(
+  //       `${user?.user?.id}/${formattedPageType}/${resultID}_${gptKeywords?.[0].keyword_generator_id}.csv`,
+  //       csvData,
+  //       { contentType: "text/csv" },
+  //     );
+
+  //   if (uploadError) {
+  //     console.error("Error uploading CSV to Supabase: ", uploadError);
+  //   } else {
+  //     console.log("CSV uploaded to Supabase: ", uploadData);
+  //   }
+
+  //   const { data: projectData, error: projectError } = await supabase
+  //     .from("projects")
+  //     .insert([
+  //       {
+  //         user_id: user?.user?.id,
+  //         csv_file_path: `${user?.user?.id}/${formattedPageType}/${resultID}_${gptKeywords?.[0].keyword_generator_id}.csv`,
+  //         project_name: mappedData.project_name,
+  //         project_type: formattedPageType,
+  //         keyword_generator_prompt_id: gptKeywords?.[0].keyword_generator_id,
+  //         gpt_keywords_id: gptKeywords?.[0].id,
+  //         amount_of_keywords: resultAmount,
+  //         gpt_keyword_sample: gptKeywords?.[0].gpt_response,
+  //       },
+  //     ]);
+
+  //   if (projectError) {
+  //     console.error("Error logging project data to Supabase: ", projectError);
+  //     console.log("projectData passed to supabase:", projectData);
+  //   }
+  // };
+
+  // const updateKeywordResults = async (gptKeywords: any) => {
+  //   // After sending the request, update the has_been_posted_to_api field to true
+  //   const { error: updateError } = await supabase
+  //     .from("gpt_keyword_results")
+  //     .update({ has_been_posted_to_api: true })
+  //     .eq("id", gptKeywords?.[0].id);
+
+  //   if (updateError) {
+  //     console.error("Error updating has_been_posted_to_api: ", updateError);
+  //   }
+  // };
+
+  // const onSubmit: SubmitHandler<FormValues> = async data => {
+  //   setIsLoading(true);
+  //   if (step < keyWordQuestionSteps.length) {
+  //     setStep(prevStep => prevStep + 1);
+  //   } else {
+  //     const mappedData = mapFormData(data, user?.user?.id);
+  //     const keywordGenPrompt = await generateKeywords(mappedData);
+  //     const gptResponseData = await handleGptResponse(
+  //       mappedData,
+  //       keywordGenPrompt![0].id,
+  //     );
+  //     await postKeywords(gptResponseData, mappedData);
+  //     await createProject(
+  //       mappedData,
+  //       gptResponseData,
+  //       resultID,
+  //       resultAmount,
+  //       mappedData,
+  //     );
+  //     await updateKeywordResults(gptResponseData);
+  //     restartProcess();
+  //   }
+  //   setIsLoading(false);
+  // };
+
   const onSubmit: SubmitHandler<FormValues> = async data => {
     setIsLoading(true);
     if (step < keyWordQuestionSteps.length) {
