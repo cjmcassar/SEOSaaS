@@ -1,7 +1,8 @@
 import router from "next/router";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 
+import { UserContext } from "@/contexts/UserContext";
 import { supabase } from "@/utils/supabaseClient";
 
 import { profileSetupQuestions } from "./data/ProfileSetupQuestions";
@@ -19,8 +20,29 @@ type FormValues = {
 };
 
 export const ProfileSetup = () => {
+  const user = useContext(UserContext);
   const { register, handleSubmit } = useForm<FormValues>();
   const [step, setStep] = useState(1);
+
+  const addUserToStripe = async () => {
+    const response = await fetch("/api/stripe", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: user?.user?.email,
+        name: user?.user?.id,
+      }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log(data);
+    } else {
+      console.error("Error:", response.status, response.statusText);
+    }
+  };
 
   const onSubmit: SubmitHandler<FormValues> = async data => {
     console.log("form data:", data);
@@ -38,6 +60,7 @@ export const ProfileSetup = () => {
         key_features_benefits: data.key_features_benefits,
         created_profile: true,
       };
+
       console.log("mapped data:", mappedData);
       const { data: uploadedData, error } = await supabase
         .from("profiles")
@@ -47,6 +70,7 @@ export const ProfileSetup = () => {
             ...mappedData,
           },
         ]);
+      addUserToStripe();
 
       if (error) {
         console.error("Error inserting data: ", error);
