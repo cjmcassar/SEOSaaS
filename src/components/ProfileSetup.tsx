@@ -19,13 +19,22 @@ type FormValues = {
   created_profile: boolean;
 };
 
+type StripeData = {
+  customer: {
+    id: string;
+    balance: Float32Array;
+    email: string;
+    created: Date;
+  };
+};
+
 export const ProfileSetup = () => {
   const user = useContext(UserContext);
   const { register, handleSubmit } = useForm<FormValues>();
   const [step, setStep] = useState(1);
 
-  const addUserToStripe = async () => {
-    const response = await fetch("/api/stripe", {
+  const addUserToStripe = async (): Promise<StripeData | undefined> => {
+    const response = await fetch("/api/stripeLogUser", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -38,9 +47,13 @@ export const ProfileSetup = () => {
 
     if (response.ok) {
       const data = await response.json();
-      console.log(data);
+      data.customer.created = new Date(data.customer.created * 1000);
+      // setStripeUserData(data);
+      console.log("stripe user logged:", data);
+      return data; // return the data
     } else {
       console.error("Error:", response.status, response.statusText);
+      return undefined;
     }
   };
 
@@ -69,11 +82,30 @@ export const ProfileSetup = () => {
             user_id: (await supabase.auth.getUser()).data.user?.id,
             ...mappedData,
           },
-        ]);
-      addUserToStripe();
+        ])
+        .select();
 
-      if (error) {
+      //TODO add stripe data to supabase
+      await addUserToStripe();
+
+      const stripeUserData = await addUserToStripe();
+
+      const { data: uploadedStripeData, error: stripeSBDataError } =
+        await supabase.from("customers").insert([
+          {
+            user_id: (await supabase.auth.getUser()).data.user?.id,
+            stripe_created_at: stripeUserData?.customer?.created,
+            stripe_id: stripeUserData?.customer?.id,
+            profile_id: uploadedData?.[0]?.id,
+            balance: stripeUserData?.customer?.balance,
+            email: stripeUserData?.customer?.email,
+          },
+        ]);
+
+      if (error || stripeSBDataError) {
         console.error("Error inserting data: ", error);
+        console.error("Error uploading stripe data:", stripeSBDataError);
+        console.log("uploadedStripeData being sent to sb:", uploadedStripeData);
         console.log("uploadedData being sent to sb:", uploadedData);
       } else {
         restartProcess();
