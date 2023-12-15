@@ -33,8 +33,8 @@ export const ProfileSetup = () => {
   const { register, handleSubmit } = useForm<FormValues>();
   const [step, setStep] = useState(1);
 
-  const addUserToStripe = async (): Promise<StripeData | undefined> => {
-    const response = await fetch("/api/stripeLogUser", {
+  const createStripeCustomer = async (): Promise<StripeData | undefined> => {
+    const response = await fetch("/api/stripe/create-customer", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -48,12 +48,59 @@ export const ProfileSetup = () => {
     if (response.ok) {
       const data = await response.json();
       data.customer.created = new Date(data.customer.created * 1000);
-      // setStripeUserData(data);
       console.log("stripe user logged:", data);
-      return data; // return the data
+      return data;
     } else {
-      console.error("Error:", response.status, response.statusText);
-      return undefined;
+      throw new Error(`Error: ${response.status}, ${response.statusText}`);
+    }
+  };
+
+  // const createCustomerSubscription = async (
+  //   customerData: StripeData,
+  // ): Promise<StripeData | undefined> => {
+  //   // Create a new subscription
+  //   const response = await fetch("/api/stripe/create-subscription", {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify({
+  //       customerId: customerData.customer.id,
+  //     }),
+  //   });
+
+  //   if (response.ok) {
+  //     const data = await response.json();
+  //     data.customer.created = new Date(data.customer.created * 1000);
+  //     console.log("stripe user logged:", data);
+  //     return data;
+  //   } else {
+  //     throw new Error(`Error: ${response.status}, ${response.statusText}`);
+  //   }
+  // };
+
+  const createCustomerSessionResponse = async (
+    customerSubcriptionData: StripeData,
+  ): Promise<StripeData | undefined> => {
+    // Create a new Checkout Session
+    const response = await fetch("/api/stripe/create-checkout-session", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        customerId: customerSubcriptionData.customer.id,
+      }),
+    });
+    const sessionData = await response.json();
+
+    if (response.ok) {
+      console.log("stripe checkout data:", sessionData);
+
+      window.open(sessionData.url, "_blank");
+      return sessionData;
+    } else {
+      throw new Error(`Error: ${response.status}, ${response.statusText}`);
     }
   };
 
@@ -85,20 +132,25 @@ export const ProfileSetup = () => {
         ])
         .select();
 
-      //TODO add stripe data to supabase
-      await addUserToStripe();
+      await createStripeCustomer();
 
-      const stripeUserData = await addUserToStripe();
+      const stripeCustomerData = await createStripeCustomer();
+      if (stripeCustomerData) {
+        await createCustomerSessionResponse(stripeCustomerData);
+      } else {
+        console.log("stripe Error");
+        return;
+      }
 
       const { data: uploadedStripeData, error: stripeSBDataError } =
         await supabase.from("customers").insert([
           {
             user_id: (await supabase.auth.getUser()).data.user?.id,
-            stripe_created_at: stripeUserData?.customer?.created,
-            stripe_id: stripeUserData?.customer?.id,
+            stripe_created_at: stripeCustomerData?.customer?.created,
+            stripe_id: stripeCustomerData?.customer?.id,
             profile_id: uploadedData?.[0]?.id,
-            balance: stripeUserData?.customer?.balance,
-            email: stripeUserData?.customer?.email,
+            balance: stripeCustomerData?.customer?.balance,
+            email: stripeCustomerData?.customer?.email,
           },
         ]);
 
