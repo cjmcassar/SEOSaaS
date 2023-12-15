@@ -24,6 +24,8 @@
 		"format": "prettier '*/**/*.{ts,tsx}' --write"
 	},
 	"dependencies": {
+		"@stripe/react-stripe-js": "^2.4.0",
+		"@stripe/stripe-js": "^2.2.1",
 		"@supabase/auth-helpers-nextjs": "^0.8.7",
 		"@supabase/supabase-js": "^2.38.4",
 		"@types/lodash": "^4.14.201",

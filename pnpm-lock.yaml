@@ -1,6 +1,8 @@
 lockfileVersion: 5.4
 
 specifiers:
+  '@stripe/react-stripe-js': ^2.4.0
+  '@stripe/stripe-js': ^2.2.1
   '@supabase/auth-helpers-nextjs': ^0.8.7
   '@supabase/supabase-js': ^2.38.4
   '@types/json2csv': ^5.0.7
@@ -32,6 +34,8 @@ specifiers:
   typescript: 5.1.3
 
 dependencies:
+  '@stripe/react-stripe-js': 2.4.0_ztiyoasxgjnxo7pvhtgictoesy
+  '@stripe/stripe-js': 2.2.1
   '@supabase/auth-helpers-nextjs': 0.8.7_6334e7jt22cxct46ozox7hiogy
   '@supabase/supabase-js': 2.38.4
   '@types/lodash': 4.14.201
@@ -355,6 +359,23 @@ packages:
 
   /@streamparser/json/0.0.6:
     resolution: {integrity: sha512-vL9EVn/v+OhZ+Wcs6O4iKE9EUpwHUqHmCtNUMWjqp+6dr85+XPOSGTEsqYNq1Vn04uk9SWlOVmx9J48ggJVT2Q==}
+    dev: false
+
+  /@stripe/react-stripe-js/2.4.0_ztiyoasxgjnxo7pvhtgictoesy:
+    resolution: {integrity: sha512-1jVQEL3OuhuzNlf4OdfqovHt+MkWh8Uh8xpLxx/xUFUDdF+7/kDOrGKy+xJO3WLCfZUL7NAy+/ypwXbbYZi0tg==}
+    peerDependencies:
+      '@stripe/stripe-js': ^1.44.1 || ^2.0.0
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      '@stripe/stripe-js': 2.2.1
+      prop-types: 15.8.1
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+    dev: false
+
+  /@stripe/stripe-js/2.2.1:
+    resolution: {integrity: sha512-Wd81A0u8EwT3cf+Xv1mpMI18RbXVhgh19MtPcF9ojNTlG3kl36B1+XFe1KQfnJxD3WRnVfDuI0rNCK53mcGm6g==}
     dev: false
 
   /@supabase/auth-helpers-nextjs/0.8.7_6334e7jt22cxct46ozox7hiogy:
@@ -2646,7 +2667,6 @@ packages:
   /object-assign/4.1.1:
     resolution: {integrity: sha512-rJgTQnkUnH1sFw8yT6VSU3zD3sWmu6sZhIseY8VX+GRu3P6F7Fu+JNDoXfklElbLJSnc3FUQHVe4cU5hj+BcUg==}
     engines: {node: '>=0.10.0'}
-    dev: true
 
   /object-hash/3.0.0:
     resolution: {integrity: sha512-RSn9F68PjH9HqtltsSnqYC1XXoWe9Bju5+213R98cNGttag9q9yAOTzdbsqvIa7aNm5WffBZFpWYr2aWrklWAw==}
@@ -2913,7 +2933,6 @@ packages:
       loose-envify: 1.4.0
       object-assign: 4.1.1
       react-is: 16.13.1
-    dev: true
 
   /proto3-json-serializer/2.0.0:
     resolution: {integrity: sha512-FB/YaNrpiPkyQNSNPilpn8qn0KdEfkgmJ9JP93PQyF/U4bAiXY5BiUdDhiDO4S48uSQ6AesklgVlrKiqZPzegw==}
@@ -2978,7 +2997,6 @@ packages:
 
   /react-is/16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
-    dev: true
 
   /react-spinners/0.13.8_biqbaboplfbrettd7655fr4n2y:
     resolution: {integrity: sha512-3e+k56lUkPj0vb5NDXPVFAOkPC//XyhKPJjvcGjyMNPWsBKpplfeyialP74G7H7+It7KzhtET+MvGqbKgAqpZA==}
