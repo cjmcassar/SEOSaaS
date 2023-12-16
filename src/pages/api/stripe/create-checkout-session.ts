@@ -14,7 +14,7 @@ const handleRequest = async (req: NextApiRequest, res: NextApiResponse) => {
       const session = await stripe.checkout.sessions.create({
         line_items: [
           {
-            price: "price_1OMKgqLrxwiUs4snU3ozUxaF",
+            price: "price_1ONlQhLrxwiUs4snb8KzDXCU",
             quantity: 1,
           },
         ],
