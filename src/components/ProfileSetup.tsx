@@ -1,7 +1,8 @@
 import router from "next/router";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 
+import { UserContext } from "@/contexts/UserContext";
 import { supabase } from "@/utils/supabaseClient";
 
 import { profileSetupQuestions } from "./data/ProfileSetupQuestions";
@@ -18,9 +19,45 @@ type FormValues = {
   created_profile: boolean;
 };
 
+type StripeData = {
+  customer: {
+    id: string;
+    balance: Float32Array;
+    email: string;
+    created: Date;
+  };
+};
+
 export const ProfileSetup = () => {
+  const user = useContext(UserContext);
   const { register, handleSubmit } = useForm<FormValues>();
   const [step, setStep] = useState(1);
+
+  const createCustomerSessionResponse = async (
+    profileId: string,
+  ): Promise<StripeData | undefined> => {
+    // Create a new Checkout Session
+    const response = await fetch("/api/stripe/create-checkout-session", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        profile_id: profileId,
+        user_id: (await supabase.auth.getUser()).data.user?.id,
+      }),
+    });
+    const sessionData = await response.json();
+
+    if (response.ok) {
+      console.log("stripe checkout data:", sessionData);
+
+      router.push(sessionData.url);
+      return sessionData;
+    } else {
+      throw new Error(`Error: ${response.status}, ${response.statusText}`);
+    }
+  };
 
   const onSubmit: SubmitHandler<FormValues> = async data => {
     console.log("form data:", data);
@@ -38,6 +75,7 @@ export const ProfileSetup = () => {
         key_features_benefits: data.key_features_benefits,
         created_profile: true,
       };
+
       console.log("mapped data:", mappedData);
       const { data: uploadedData, error } = await supabase
         .from("profiles")
@@ -46,20 +84,16 @@ export const ProfileSetup = () => {
             user_id: (await supabase.auth.getUser()).data.user?.id,
             ...mappedData,
           },
-        ]);
+        ])
+        .select();
 
-      if (error) {
-        console.error("Error inserting data: ", error);
-        console.log("uploadedData being sent to sb:", uploadedData);
+      const profileId = uploadedData?.[0]?.id;
+      if (profileId) {
+        await createCustomerSessionResponse(profileId);
       } else {
-        restartProcess();
-        router.reload();
+        console.error("Error: profileId is undefined");
       }
     }
-  };
-
-  const restartProcess = () => {
-    setStep(1);
   };
 
   return (
