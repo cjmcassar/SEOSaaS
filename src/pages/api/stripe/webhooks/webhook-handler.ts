@@ -1,9 +1,19 @@
 import { Readable } from "stream";
 
+import { createClient } from "@supabase/supabase-js";
 import { NextApiRequest, NextApiResponse } from "next";
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
+
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!SUPABASE_URL || !SUPABASE_KEY) {
+  throw new Error("Missing Supabase environment variables");
+}
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 export const config = {
   api: {
@@ -46,16 +56,58 @@ export default async function handler(
     switch (event.type) {
       case "checkout.session.completed":
         data = event.data.object as Stripe.Checkout.Session;
-        console.log(`💰 CheckoutSession data: ${data}`);
+        console.log(`💰 CheckoutSession data: ${data.customer_details}`);
         console.log(`💰 CheckoutSession status: ${data.payment_status}`);
+
+        const session = await stripe.checkout.sessions.retrieve(data.id);
+
+        if (session.metadata) {
+          // Get the profile_id from the session metadata
+          const profile_id = session.metadata.profile_id;
+          const customerId = session.customer;
+          const customerEmail = session.customer_details?.email;
+          const appUserId = session.metadata.user_id;
+
+          console.log(`💰 Profile ID: ${profile_id}`);
+          console.log("current user logged:", session.customer_details);
+
+          const {
+            data: uploadedStripeData,
+            error,
+            error: stripeSBDataError,
+          } = await supabase.from("customers").insert([
+            {
+              user_id: appUserId,
+              stripe_created_at: new Date(session.created * 1000),
+              stripe_id: customerId,
+              profile_id: profile_id,
+              email: customerEmail,
+              is_paid: true,
+            },
+          ]);
+
+          if (error || stripeSBDataError) {
+            console.error("Error inserting data: ", error);
+            console.error("Error uploading stripe data:", stripeSBDataError);
+            console.log(
+              "uploadedStripeData being sent to sb:",
+              uploadedStripeData,
+            );
+          }
+        } else {
+          console.log("⚠️ Metadata is null");
+        }
+
         break;
       case "payment_intent.payment_failed":
         data = event.data.object as Stripe.PaymentIntent;
+
         console.log(`❌ Payment failed: ${data.last_payment_error?.message}`);
         break;
       case "payment_intent.succeeded":
         data = event.data.object as Stripe.PaymentIntent;
         console.log(`💰 PaymentIntent status: ${data.status}`);
+
         break;
       case "customer.subscription.created":
         console.log(`💰 Subscription created: ${event}`);
