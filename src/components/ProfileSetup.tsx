@@ -33,54 +33,8 @@ export const ProfileSetup = () => {
   const { register, handleSubmit } = useForm<FormValues>();
   const [step, setStep] = useState(1);
 
-  const createStripeCustomer = async (): Promise<StripeData | undefined> => {
-    const response = await fetch("/api/stripe/create-customer", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: user?.user?.email,
-        name: user?.user?.id,
-      }),
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      data.customer.created = new Date(data.customer.created * 1000);
-      console.log("stripe user logged:", data);
-      return data;
-    } else {
-      throw new Error(`Error: ${response.status}, ${response.statusText}`);
-    }
-  };
-
-  // const createCustomerSubscription = async (
-  //   customerData: StripeData,
-  // ): Promise<StripeData | undefined> => {
-  //   // Create a new subscription
-  //   const response = await fetch("/api/stripe/create-subscription", {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify({
-  //       customerId: customerData.customer.id,
-  //     }),
-  //   });
-
-  //   if (response.ok) {
-  //     const data = await response.json();
-  //     data.customer.created = new Date(data.customer.created * 1000);
-  //     console.log("stripe user logged:", data);
-  //     return data;
-  //   } else {
-  //     throw new Error(`Error: ${response.status}, ${response.statusText}`);
-  //   }
-  // };
-
   const createCustomerSessionResponse = async (
-    customerSubcriptionData: StripeData,
+    profileId: string,
   ): Promise<StripeData | undefined> => {
     // Create a new Checkout Session
     const response = await fetch("/api/stripe/create-checkout-session", {
@@ -89,7 +43,8 @@ export const ProfileSetup = () => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        customerId: customerSubcriptionData.customer.id,
+        profile_id: profileId,
+        user_id: (await supabase.auth.getUser()).data.user?.id,
       }),
     });
     const sessionData = await response.json();
@@ -97,7 +52,7 @@ export const ProfileSetup = () => {
     if (response.ok) {
       console.log("stripe checkout data:", sessionData);
 
-      window.open(sessionData.url, "_blank");
+      router.push(sessionData.url);
       return sessionData;
     } else {
       throw new Error(`Error: ${response.status}, ${response.statusText}`);
@@ -132,42 +87,13 @@ export const ProfileSetup = () => {
         ])
         .select();
 
-      await createStripeCustomer();
-
-      const stripeCustomerData = await createStripeCustomer();
-      if (stripeCustomerData) {
-        await createCustomerSessionResponse(stripeCustomerData);
+      const profileId = uploadedData?.[0]?.id;
+      if (profileId) {
+        await createCustomerSessionResponse(profileId);
       } else {
-        console.log("stripe Error");
-        return;
-      }
-
-      const { data: uploadedStripeData, error: stripeSBDataError } =
-        await supabase.from("customers").insert([
-          {
-            user_id: (await supabase.auth.getUser()).data.user?.id,
-            stripe_created_at: stripeCustomerData?.customer?.created,
-            stripe_id: stripeCustomerData?.customer?.id,
-            profile_id: uploadedData?.[0]?.id,
-            balance: stripeCustomerData?.customer?.balance,
-            email: stripeCustomerData?.customer?.email,
-          },
-        ]);
-
-      if (error || stripeSBDataError) {
-        console.error("Error inserting data: ", error);
-        console.error("Error uploading stripe data:", stripeSBDataError);
-        console.log("uploadedStripeData being sent to sb:", uploadedStripeData);
-        console.log("uploadedData being sent to sb:", uploadedData);
-      } else {
-        restartProcess();
-        router.reload();
+        console.error("Error: profileId is undefined");
       }
     }
-  };
-
-  const restartProcess = () => {
-    setStep(1);
   };
 
   return (
