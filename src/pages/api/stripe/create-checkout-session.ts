@@ -10,8 +10,13 @@ interface CustomError extends Error {
 const handleRequest = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
     try {
+      const { profile_id, user_id } = req.body;
       // Create Checkout Sessions from body params.
       const session = await stripe.checkout.sessions.create({
+        metadata: {
+          profile_id,
+          user_id,
+        },
         line_items: [
           {
             price: "price_1ONlQhLrxwiUs4snb8KzDXCU",
