@@ -98,7 +98,7 @@ export function Content(props: ContentProps) {
             </div>
             <div className="pr-10">
               <div className="text-2xl font-bold">{projects?.length}</div>
-              <div className="">SEO Sessions</div>
+              <div className="">SEO Projects</div>
             </div>
           </div>
         </div>
