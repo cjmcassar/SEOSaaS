@@ -12,7 +12,7 @@ const handleRequest = async (req: NextApiRequest, res: NextApiResponse) => {
     try {
       const { profile_id, user_id } = req.body;
       // Create Checkout Sessions from body params.
-      const session = await stripe.checkout.sessions.create({
+      const params: Stripe.Checkout.SessionCreateParams = {
         metadata: {
           profile_id,
           user_id,
@@ -26,7 +26,8 @@ const handleRequest = async (req: NextApiRequest, res: NextApiResponse) => {
         mode: "subscription",
         success_url: `${req.headers.origin}`,
         cancel_url: `${req.headers.origin}`,
-      });
+      };
+      const session = await stripe.checkout.sessions.create(params);
       if (session.url) {
         res.status(200).json({ url: session.url });
       } else {
