@@ -43,8 +43,20 @@ export default async function POST(req: Request) {
 
   const permittedEvents: string[] = [
     "checkout.session.completed",
-    "payment_intent.succeeded",
     "payment_intent.payment_failed",
+    "payment_intent.succeeded",
+    "customer.subscription.created",
+    "customer.subscription.updated",
+    "payment_intent.created",
+    "invoice.created",
+    "invoice.finalized",
+    "invoice.updated",
+    "invoice.paid",
+    "invoice.payment_succeeded",
+    "customer.updated",
+    "customer.created",
+    "charge.succeeded",
+    "payment_method.attached",
   ];
 
   if (permittedEvents.includes(event.type)) {
@@ -69,28 +81,42 @@ export default async function POST(req: Request) {
             console.log(`💰 Profile ID: ${profile_id}`);
             console.log("current user logged:", session.customer_details);
 
-            const {
-              data: uploadedStripeData,
-              error,
-              error: stripeSBDataError,
-            } = await supabase.from("customers").insert([
-              {
-                user_id: appUserId,
-                stripe_created_at: new Date(session.created * 1000),
-                stripe_id: customerId,
-                profile_id: profile_id,
-                email: customerEmail,
-                is_paid: true,
-              },
-            ]);
+            // Check if the customer already exists in the database
+            const { data: existingCustomer } = await supabase
+              .from("customers")
+              .select("*")
+              .eq("stripe_id", customerId)
+              .single();
 
-            if (error || stripeSBDataError) {
-              console.error("Error inserting data: ", error);
-              console.error("Error uploading stripe data:", stripeSBDataError);
-              console.log(
-                "uploadedStripeData being sent to sb:",
-                uploadedStripeData,
-              );
+            if (!existingCustomer) {
+              const {
+                data: uploadedStripeData,
+                error,
+                error: stripeSBDataError,
+              } = await supabase.from("customers").insert([
+                {
+                  user_id: appUserId,
+                  stripe_created_at: new Date(session.created * 1000),
+                  stripe_id: customerId,
+                  profile_id: profile_id,
+                  email: customerEmail,
+                  is_paid: true,
+                },
+              ]);
+
+              if (error || stripeSBDataError) {
+                console.error("Error inserting data: ", error);
+                console.error(
+                  "Error uploading stripe data:",
+                  stripeSBDataError,
+                );
+                console.log(
+                  "uploadedStripeData being sent to sb:",
+                  uploadedStripeData,
+                );
+              }
+            } else {
+              console.log("⚠️ Customer already exists in the database");
             }
           } else {
             console.log("⚠️ Metadata is null");
@@ -99,13 +125,11 @@ export default async function POST(req: Request) {
           break;
         case "payment_intent.payment_failed":
           data = event.data.object as Stripe.PaymentIntent;
-
           console.log(`❌ Payment failed: ${data.last_payment_error?.message}`);
           break;
         case "payment_intent.succeeded":
           data = event.data.object as Stripe.PaymentIntent;
           console.log(`💰 PaymentIntent status: ${data.status}`);
-
           break;
         case "customer.subscription.created":
           console.log(`💰 Subscription created: ${event}`);
