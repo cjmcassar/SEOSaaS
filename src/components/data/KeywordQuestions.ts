@@ -41,3 +41,13 @@ export const keyWordQuestionSteps = [
     validation: { required: false },
   },
 ];
+
+// {
+//   id: 1,
+//   question: "What country are your users located?",
+//   name: "userCountry",
+//   type: "dropdown",
+//   options: ["UK", "US"],
+//   placeholder: "Select a country",
+//   validation: { required: true },
+// },
